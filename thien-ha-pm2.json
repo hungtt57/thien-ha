@@ -1,0 +1,15 @@
+{
+  "apps": [{
+    "name": "thien-ha",
+    "script": "dist/server/app.js",
+    "watch": true,
+    "ignore_watch": ["node_modules"],
+    "env": {
+        "NODE_ENV": "production"
+      },
+    "instances": 0,
+    "max_memory_restart": "2G",
+    "max_restarts": 10
+    }
+  ]
+}

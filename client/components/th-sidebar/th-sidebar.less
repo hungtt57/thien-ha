@@ -1,0 +1,37 @@
+.th-sidebar {
+  background: url("../../assets/images/sidebar.png") no-repeat;
+  width: 155px;
+  max-width: 100%;
+  height: auto;
+  -webkit-background-size: 100%;
+  -o-background-size: 100%;
+  background-size: 100%;
+
+  // height: 282px;
+  list-style-type: none;
+  padding-left: 0;
+  li {
+    height: 45px;
+    margin-bottom: 17px;
+    a {
+      display: block;
+      height: 45px;
+      text-indent: -9999em;
+    }
+     :hover {
+      background-color: rgba(255,255,255,.2);
+      border-radius: 4px;
+    }
+    &:nth-child(2),
+    &:nth-child(3) {
+      margin-bottom: 15px;
+    }
+    &:nth-child(4),
+    &:nth-child(5) {
+      margin-bottom: 14px;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}

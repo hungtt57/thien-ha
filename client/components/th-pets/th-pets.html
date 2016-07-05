@@ -1,0 +1,7 @@
+<h1>Linh thần</h1>
+<div class="owl-carousel owl-theme">
+  <div ng-repeat="pet in pets" popover-title="{{ pet.name }}" uib-popover="{{ pet.description }}" popover-placement="bottom" popover-trigger="mouseenter">
+    <img ng-src="{{pet.image}}" style="margin:auto;"  />
+  </div>
+</div>
+

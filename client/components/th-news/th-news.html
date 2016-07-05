@@ -1,0 +1,21 @@
+<div class="news-tabs">
+  <uib-tabset>
+    <uib-tab heading="{{tab.category_name}}" ng-repeat="tab in tabs track by $index" active="tab.active" disable="tab.disabled">
+      <div class="news-content">
+        <ul>
+          <li ng-repeat="post in tab | orderBy: '-publish' | limitTo:maxSize:itemsPerPage*(bigCurrentPage-1)  track by $index">
+            <span class="news-type">{{ post.category.name }}</span>
+            <a href="/post/{{ post.slug }}">{{ post.title }}</a>
+            <span class="date">
+              {{ post.publish | date:'dd/MM' }}
+            </span>
+          </li>
+        </ul>
+        <a href="/category/{{catSlug[$index]}}" class="viewmore" ng-show="isActive('/')">xem thêm...</a>
+      </div>
+      <div class="news-paging">
+        <uib-pagination total-items="tab.length" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" ng-hide="isActive('/')"  previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
+      </div>
+    </uib-tab>
+  </uib-tabset>
+</div>

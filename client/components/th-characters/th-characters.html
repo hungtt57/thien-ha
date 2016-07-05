@@ -1,0 +1,7 @@
+<h1>Nhân vật</h1>
+<ul id="thCharacters">
+	<li ng-repeat="slide in slides">
+		<img ng-src="{{slide.image}}" style="margin:auto;">
+    <a ng-href="{{ slide.url }}" class="th-character-readmore" target="_blank">Xem thêm...</a>
+	</li>
+</ul>

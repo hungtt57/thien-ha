@@ -1,0 +1,2202 @@
+/* Author: Jianfei
+ * Report Bug: zhangj@garena.com
+ * Documentation: http://cdn.garenanow.com/webupdate/games/sg/doc/
+ * TODO: gstickup update
+ * TODO: gscrollspy update
+ * TODO: gcoverflow update
+ * TODO: glist create
+ * TODO: gcarousel create
+ */
+
+;(function ( $, window, document, undefined ) {
+    $.glib = {
+        disablePageScroll: function(){
+            $( 'body' ).css( 'padding-right', $.glib.getScrollbarWidth() + 'px' )
+                       .css( 'overflow-y', 'hidden' );
+        },
+
+        enablePageScroll: function(){
+            $( 'body' ).css( 'padding-right', '' )
+                       .css( 'overflow-y', '' );
+        },
+
+        getPageBottomHeight: function() {
+            return $(window).scrollTop() + $(window).height();
+        },
+
+        getPageTopHeight: function() {
+            return $(window).scrollTop();
+        },
+
+        getScrollbarWidth: function() {
+            return window.innerWidth - $(window).width();
+        },
+
+        getUrlParameters: function() {
+            var params = {};
+            window.location.search.replace( /[?&]+([^=&]+)=([^&]*)/gi, function( match, key, value ) {
+                params[ key ] = value;
+            });
+            return params;
+        },
+
+        init: function(){
+            var methods = {
+                create: function() {
+                    $.gheader();
+                    $.gfooter();
+                    $.gmodal();
+                    $.gcountdown();
+                    $.gstickup();
+                    $.gscrollspy();
+                    $.gcoverflow();
+                    $.gfixed();
+                },
+
+                handleShorthandClasses: function(){
+                    $( $.gdetect('isMobile') ? '.desktop-only' : '.mobile-only' ).remove();
+                },
+
+                loadShorthandOptions: function() {
+                    if( $( 'body' ).attr( 'data-game' ) ) { $.glib.defaults.game = $( 'body' ).attr( 'data-game' ); }
+                },
+            };
+
+            methods.loadShorthandOptions();
+            methods.handleShorthandClasses();
+            methods.create();
+        },
+
+        isPageScrolledToBottom: function() {
+            return $.glib.getPageBottomHeight() == $(document).height();
+        },
+
+        isPageScrolledToTop: function() {
+            return $.glib.getPageTopHeight() == 0;
+        },
+
+        log: function( msg ){
+            if( $.glib.defaults.debugMode ){ console.log( msg ); }
+        },
+
+        pad: function( num, numDigits ){
+            return ( 1e15 + num + '' ).slice( -numDigits );
+        },
+
+        scrollTo: function( target, offset, duration, easing, complete ) {
+            offset =     offset   || 0;
+            duration =   duration || 200;
+            easing =     easing   || "linear";
+
+            var scrollTop;
+            if( $.isNumeric( target ) ){
+                scrollTop = parseInt( target ) - offset;
+            }
+            else if( target === 'top' ){
+                scrollTop = 0;
+            }
+            else if( target === 'bottom' ){
+                scrollTop = $(document).height();
+            }
+            else {
+                scrollTop = $( target ).offset().top - offset;
+            }
+            $( 'html, body' ).animate( { scrollTop: scrollTop + 'px' }, duration, easing, complete );
+        },
+
+    };
+
+    $.glib.defaults = {
+        GHEADER_HTML:             '<div id="gheader"> <div id="gheader-content"> <a target="_blank"><div id="gheader-banner"><div id="gheader-popover-banner"></div></div></a> <a href="http://www.garena.vn/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/gheader-garena-logo.jpg"></a> <ul id="gheader-btns"> <li class="gheader-btn"><a href="/news.html#contest" target="_blank">Giải đấu</a></li> <li class="gheader-btn"><a href="http://platform.garena.vn/register/" target="_blank">Đăng kí</a></li> <li class="gheader-btn"><a href="http://mshop.garena.vn/" target="_blank">Nạp thẻ</a></li> <div class="gheader-separater"></div> <li id="gheader-games"> <span>Các Game của Garena</span><ul><li><a href="http://lienminh.garena.vn/" target="_blank">Liên Minh Huyền Thoại</a></li><li><a href="http://hon.garena.com/" target="_blank">HEROES OF NEWERTH</a></li><li><a href="http://fo3.garena.vn/" target="_blank">FIFA ONLINE 3</a></li><li><a href="http://qbht.vn/" target="_blank">Quân Bài Huyền Thoại</a></li><li><a href="http://ccht.garena.vn/" target="_blank">Chiến Cơ Huyền Thoại</a></li></ul> </li> </ul>  </div></div>',
+        GHEADER_BANNER_LINK:      'download.html?utm_source=OrganicA&utm_medium=OrganicA&utm_campaign=site_garena_websiteheader',
+        GHEADER_BANNER_BLACKLIST: [],
+        GFOOTER_HTML_BS:          '<footer id="gfooter-bs" class="gfooter"> <ul> <li><a href="http://www.grindinggear.com/%E2%80%8E" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-vertigo.png" class="gfooter-logo"></a></li> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; 2010 <a href="http://www.garena.com">Garena Online</a>, All rights reserved.<br> </p> </li> <li><a href="http://www.youtube.com/user/BlackShotOnline" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-youtube.png" class="gfooter-icon"></a></li> <li><a href="http://www.facebook.com/blackshotonline/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-facebook.png" class="gfooter-icon"></a></li> <li><a href="https://twitter.com/#!/GarenaBS" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-twitter.png" class="gfooter-icon"></a></li> </ul></footer>',
+        GFOOTER_HTML_CM:          '<footer id="gfooter-cm" class="gfooter"> <ul> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena-dark.png" class="gfooter-logo"></a></li> <li><a href="http://www.softbigbang.com" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-sbb.png" class="gfooter-logo"></a></li> <li><p id="gfooter-copyright">&copy; Garena Online. Trademarks belong to their respective owners. All rights reserved.</p></li> </ul> </footer>',
+        GFOOTER_HTML_DTHERO:      '<footer id="gfooter-dthero" class="gfooter"> <ul> <li><a target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-yidong.png" class="gfooter-logo"></a></li> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; Garena Online. Trademarks belong to their respective owners. All rights reserved. </p> </li> <li><a href="https://www.youtube.com/garenadthero" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-youtube.png" class="gfooter-icon"></a></li> <li><a href="https://www.facebook.com/garenadthero" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-facebook.png" class="gfooter-icon"></a></li><!--<li><a href="https://twitter.com/garenadthero" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-twitter.png" class="gfooter-icon"></a></li>--></ul></footer>',
+        GFOOTER_HTML_FO3:         '<footer id="gfooter-fo3" class="gfooter"> <ul> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena-narrow.png" class="gfooter-logo"></a></li> <li><a href="http://www.easports.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-ea.png" class="gfooter-logo"></a></li> <li><a href="http://www.fifa.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-fifa.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; 2013 ELECTRONIC ARTS INC. EA, EA SPORTS, AND THE EA SPORTS LOGO ARE TRADEMARKS OF ELECTRONIC ARTS INC. OFFICIAL FIFA LICENSED PRODUCT. "&copy; THE FIFA NAME AND OLP LOGO ARE COPYRIGHT OR TRADEMARK PROTECTED BY FIFA. ALL RIGHTS RESERVED." MANUFACTURED UNDER LICENSE BY ELECTRONIC ARTS INC. THE USE OF REAL PLAYER NAMES AND LIKENESSES IS AUTHORIZED BY FIFPRO COMMERCIAL ENTERPRISES BV. THE PREMIER LEAGUE LOGO &copy; THE FOOTBALL ASSOCIATION PREMIER LEAGUE LIMITED 2006. THE PREMIER LEAGUE LOGO IS A TRADEMARK OF THE FOOTBALL ASSOCIATION PREMIER LEAGUE LIMITED WHICH IS REGISTERED IN THE UK AND OTHER JURISDICTIONS. THE PREMIER LEAGUE CLUB LOGOS ARE COPYRIGHT WORKS AND REGISTERED TRADEMARKS OF THE RESPECTIVE CLUBS. ALL ARE USED WITH THE KIND PERMISSION OF THEIR RESPECTIVE OWNERS. MANUFACTURED UNDER LICENSE FROM THE FOOTBALL ASSOCIATION PREMIER LEAGUE LIMITED. NO ASSOCIATION WITH NOR ENDORSEMENT OF THIS PRODUCT BY ANY PLAYER IS INTENDED OR IMPLIED BY THE LICENSE GRANTED BY THE FOOTBALL ASSOCIATION PREMIER LEAGUE LIMITED TO ELECTRONIC ARTS. ALL OTHER TRADEMARKS ARE THE PROPERTY OF THEIR RESPECTIVE OWNERS. </p> </li> </ul></footer>',
+        GFOOTER_HTML_HON:         '<footer id="gfooter-hon" class="gfooter"> <ul> <li><a href="http://www.s2games.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-s2games.png" class="gfooter-logo"></a></li> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; Garena Online. Trademarks belong to their respective owners. All rights reserved. </p> </li> <li><a href="http://www.youtube.com/user/GarenaHoNSEA" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-youtube.png" class="gfooter-icon"></a></li> <li><a href="http://www.facebook.com/GarenaHoN" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-facebook.png" class="gfooter-icon"></a></li> <li><a href="http://www.twitter.com/garenahonsea" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-twitter.png" class="gfooter-icon"></a></li> </ul></footer>',
+        GFOOTER_HTML_LOL:         '<footer id="gfooter-lol" class="gfooter"> <ul> <li><a href="http://www.riotgames.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-riot.png" class="gfooter-logo"></a></li> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; Garena Online. Trademarks belong to their respective owners. All rights reserved. <br> &copy; 2010 Riot Games, Inc. "Riot Games" and "League of Legends" are trademarks, service marks <br> and/or registered trademarks throughout the world. All rights reserved. </p> </li> <li><a href="http://www.youtube.com/user/GarenaLoL" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-youtube.png" class="gfooter-icon"></a></li> <li><a href="http://www.facebook.com/pages/Garena-League-of-Legends/121718387875134" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-facebook.png" class="gfooter-icon"></a></li> <li><a href="http://twitter.com/GarenaLoL" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-twitter.png" class="gfooter-icon"></a></li> </ul></footer>',
+        GFOOTER_HTML_MSTAR:       '<footer id="gfooter-mstar" class="gfooter"> <ul> <li><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-cjem.png" class="gfooter-logo"></li> <li><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-nurien.png" class="gfooter-logo"></li> <li><a href="http://www.garena.com" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; Garena Online. Trademarks belong to their respective owners. All rights reserved.<br> &copy; CJ E&M Corp. All rights reserved. </p> </li> <li><a href="http://www.youtube.com/user/GarenaMstarSG" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-youtube.png" class="gfooter-icon"></a></li> <li><a href="http://www.facebook.com/MstarGarena" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/icon-facebook.png" class="gfooter-icon"></a></li> </ul></footer>',
+        GFOOTER_HTML_PB:          '<footer id="gfooter-pb" class="gfooter"> <ul> <li><a href="http://www.zepetto.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-zepetto.png" class="gfooter-logo"></a></li> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> Copyright &copy; <a href="http://www.garena.com/" target="_blank">Garena Online</a>. Zepetto, Point Blank and their respective logos are trademarks and/or registered trademarks of Zepetto Co. Ltd. All rights reserved. </p> </li> </ul></footer>',
+        GFOOTER_HTML_POE:         '<footer id="gfooter-poe" class="gfooter"> <ul> <li><a href="http://www.garena.com/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena-dark.png" class="gfooter-logo"></a></li> <li><a href="http://www.grindinggear.com/%E2%80%8E" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-ggg-dark.png" class="gfooter-logo"></a></li> <li> <p id="gfooter-copyright"> &copy; <a href="http://www.garena.com">Garena Online</a>. Trademarks belong to their respective owners. All rights reserved.<br> &copy; 2010 - 2014 <a href="http://www.grindinggear.com">Grinding Gear Games</a><br> <a href="http://poe-beta.garena.com/legal/terms-of-use-and-privacy-policy">Terms of Use and Privacy Policy</a> - <a target="_blank" href="http://www.garena.sg/support/">Contact Support</a> </p> </li> </ul></footer>',
+        GFOOTER_HTML_SUNMOSH:     '<footer id="footer-ts" class="gfooter"><ul><li><a target="_blank"><img src="assets/images/logo-sunmosh.png" class="gfooter-logo"></a></li><li><a href="http://www.garena.vn/" target="_blank"><img src="http://cdn.garenanow.com/webupdate/games/sg/assets/img/logo-garena.png" class="gfooter-logo"></a></li><li><p id="gfooter-copyright"> © Garena Online. Trademarks belong to their respective owners. All rights reserved. </p></li></ul></footer> ',
+        AVAILABLE_GAMES:          [ 'bs', 'cm', 'dthero', 'fo3', 'hon', 'lol', 'mstar', 'pb', 'poe', 'sunmosh' ],
+        game:                     'none',
+        debugMode:                true,
+    };
+
+    $.gheader = function( action, args ) {
+        var methods = {
+                create: function() {
+                    if( options.showOnReady ){
+                        methods.createGheader();
+                        methods.updateOptions();
+                    }
+
+                    methods.dispatchEvent( 'gheader.create', { gheader: gheader } );
+                    $.glib.log( '[glib log] create gheader: successful.' );
+                },
+
+                createGheader: function() {
+                    gheader = $( $.glib.defaults.GHEADER_HTML ).prependTo( options.insertTarget );
+                    ( options.showBanner && !methods.isInBlacklist() ) ? methods.setBannerLink() : methods.removeBanner();
+                },
+
+                destory: function() {
+                    methods.destoryGheader();
+
+                    methods.dispatchEvent( 'gheader.destory', { gheader: gheader } );
+                    $.glib.log( '[glib log] destory gheader: successful.' );
+                },
+
+                destoryGheader: function() {
+                    gheader.remove();
+                },
+
+                dispatchEvent: function( event, data ) {
+                    $( document, gheader ).trigger( event, data );
+
+                    switch( event ) {
+                        case 'gheader.create':  if( options.onCreate )  { options.onCreate( data ); }  break;
+                        case 'gheader.destory': if( options.onDestory ) { options.onDestory( data ); } break;
+                        case 'gheader.update':  if( options.onUpdate )  { options.onUpdate( data ); }  break;
+                    }
+                },
+
+                getGheader: function() {
+                    return $( '#gheader' );
+                },
+
+                getBanner: function() {
+                    return $( '#gheader-banner' ).parent( 'a' );
+                },
+
+                getShorthandOptions: function() {
+                    var shorthandOptions = {};
+                    if( $( 'body' ).hasClass( 'hide-gheader' ) )        { shorthandOptions.showOnReady = false; }
+                    if( $( 'body' ).hasClass( 'hide-gheader-banner' ) ) { shorthandOptions.showBanner = false; }
+                    return shorthandOptions;
+                },
+
+                isCreated: function() {
+                    return methods.getGheader().length > 0;
+                },
+
+                isInBlacklist: function() {
+                    return $.inArray( $.glib.defaults.game, $.glib.defaults.GHEADER_BANNER_BLACKLIST ) != -1;
+                },
+
+                isNewInstance: function() {
+                    if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                        args = action;
+                        action = 'create';
+                    }
+
+                    return action === 'create';
+                },
+
+                load: function(){
+                    if( methods.isNewInstance() ) {
+                        if( methods.isCreated() ){
+                            $.glib.log( '[glib log] create gheader: failed - gheader already exists.' );
+                            exit = true;
+                        }
+                        else {
+                            options = $.extend( {}, $.gheader.defaults, methods.getShorthandOptions(), args );
+                            gheader  = $( $.glib.defaults.GHEADER_HTML );
+                        }
+                    }
+                    else {
+                        if( methods.isCreated() ){
+                            gheader = methods.getGheader();
+                            if( action === 'options' ){
+                                if( args ){
+                                    options = $.extend( {}, gheader.data( 'gheader-options' ), args );
+                                }
+                                else {
+                                    $.glib.log( '[glib log] update gheader options: failed - options not defined.' );
+                                    exit = true;
+                                }
+                            }
+                            else {
+                                options = gheader.data( 'gheader-options' );
+                            }
+                        }
+                        else {
+                            $.glib.log( '[glib log] gheader: command "' + action + '" failed - gheader never created.' );
+                            exit = true;
+                        }
+                    }
+                },
+
+                removeBanner: function() {
+                    methods.getBanner().remove();
+                },
+
+                setBannerLink: function() {
+                    if( $.glib.defaults.GHEADER_BANNER_LINK ) {
+                        methods.getBanner().attr( 'href', $.glib.defaults.GHEADER_BANNER_LINK );
+                    }
+                },
+
+                updateOptions: function() {
+                    gheader.data( 'gheader-options', options );
+                },
+
+                update: function() {
+                    methods.destoryGheader();
+                    methods.createGheader();
+                    methods.updateOptions();
+
+                    methods.dispatchEvent( 'gheader.update', { gheader: gheader } );
+                    $.glib.log( '[glib log] update gheader: successful.' );
+                },
+
+            };
+
+        var gheader,
+            options,
+            exit = false;
+
+        methods.load();
+
+        if( !exit ){
+            switch( action ) {
+                case 'create':  methods.create();        break;
+                case 'destory': methods.destory();       break;
+                case 'options': methods.updateOptions(); break;
+                case 'update':  methods.update();        break;
+                default:        $.glib.log( '[glib log] gheader: command "' + action + '" not found.' );
+            }
+        }
+    };
+
+    $.gheader.defaults = {
+        showOnReady:  true,
+        showBanner:   true,
+        insertTarget: 'body',
+    };
+
+    $.gfooter = function( action, args ) {
+        var methods = {
+                create: function() {
+                    if( methods.isGameAvailable() ){
+                        if( options.showOnReady ) {
+                            methods.createGfooter();
+                            methods.updateOptions();
+                        }
+
+                        methods.dispatchEvent( 'gfooter.create', { gfooter: gfooter } );
+                        $.glib.log( '[glib log] create gfooter: successful.' );
+                    }
+                    else {
+                        $.glib.log( '[glib log] create gfooter: failed - game "' + $.glib.defaults.game + '" is not available.' );
+                    }
+                },
+
+                createGfooter: function() {
+                    gfooter = $( $.glib.defaults[ 'GFOOTER_HTML_' + $.glib.defaults.game.toUpperCase() ] ).appendTo( options.insertTarget );
+                    methods.setBackgroundColor();
+                    methods.setIcons();
+                },
+
+                destory: function() {
+                    methods.destoryGfooter();
+
+                    methods.dispatchEvent( 'gfooter.destory', { gfooter: gfooter } );
+                    $.glib.log( '[glib log] destory gfooter: successful.' );
+                },
+
+                destoryGfooter: function(){
+                    gfooter.remove();
+                },
+
+                dispatchEvent: function( event, data ) {
+                    $( document, gfooter ).trigger( event, data );
+                    switch( event ) {
+                        case 'gfooter.create':  if( options.onCreate )  { options.onCreate( data ); }  break;
+                        case 'gfooter.destory': if( options.onDestory ) { options.onDestory( data ); } break;
+                        case 'gfooter.update':  if( options.onUpdate )  { options.onUpdate( data ); }  break;
+                    }
+                },
+
+                getGfooter: function() {
+                    return $( '#gfooter-' + $.glib.defaults.game );
+                },
+
+                getShorthandOptions: function() {
+                    var shorthandOptions = {};
+                    if( $( 'body' ).hasClass( 'hide-gfooter' ) ){ shorthandOptions.showOnReady = false; }
+                    return shorthandOptions;
+                },
+
+                isCreated: function() {
+                    return methods.getGfooter().length > 0;
+                },
+
+                isGameAvailable: function() {
+                    return $.inArray( $.glib.defaults.game, $.glib.defaults.AVAILABLE_GAMES ) != -1;
+                },
+
+                isNewInstance: function() {
+                    if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                        args = action;
+                        action = 'create';
+                    }
+
+                    return action === 'create';
+                },
+
+                load: function(){
+                    if( methods.isNewInstance() ) {
+                        if( methods.isCreated() ){
+                            $.glib.log( '[glib log] create gfooter: failed - gfooter already exists.' );
+                            exit = true;
+                        }
+                        else {
+                            options = $.extend( {}, $.gfooter.defaults, methods.getShorthandOptions(), args );
+                        }
+                    }
+                    else {
+                        if( methods.isCreated() ){
+                            gfooter = methods.getGfooter();
+                            if( action === 'options' ){
+                                if( args ){
+                                    options = $.extend( {}, gfooter.data( 'gfooter-options' ), args );
+                                }
+                                else {
+                                    $.glib.log( '[glib log] update gfooter options: failed - options not defined.' );
+                                    exit = true;
+                                }
+                            }
+                            else {
+                                options = gfooter.data( 'gfooter-options' );
+                            }
+                        }
+                        else {
+                            $.glib.log( '[glib log] gfooter: command "' + action + '" failed - gfooter never created.' );
+                            exit = true;
+                        }
+                    }
+                },
+
+                setBackgroundColor: function() {
+                    if( options.backgroundColor != 'default' ) {
+                        gfooter.css( 'background-color', options.backgroundColor );
+                    }
+                },
+
+                setIcons: function() {
+                    if( !options.showSocialIcons ) {
+                        gfooter.find( '.gfooter-icon' ).remove();
+                    }
+                },
+
+                updateOptions: function() {
+                    gfooter.data( 'gfooter-options', options );
+                },
+
+                update: function() {
+                    methods.destoryGfooter();
+                    methods.createGfooter();
+                    methods.updateOptions();
+
+                    methods.dispatchEvent( 'gfooter.update', { gfooter: gfooter } );
+                    $.glib.log( '[glib log] update gfooter: successful.' );
+                },
+            };
+
+        var gfooter,
+            options,
+            exit = false;
+
+        methods.load();
+
+        if( !exit ){
+            switch( action ) {
+                case 'create':  methods.create();        break;
+                case 'destory': methods.destory();       break;
+                case 'options': methods.updateOptions(); break;
+                case 'update':  methods.update();        break;
+                default:        $.glib.log( '[glib log] gfooter: command "' + action + '" not found.' );
+            }
+        }
+    };
+
+    $.gfooter.defaults = {
+        showOnReady:     true,
+        showSocialIcons: true,
+        insertTarget:    'body',
+        backgroundColor: 'default',
+    };
+
+    $.gmodal = function( action ) {
+        var methods = {
+                closeAll: function() {
+                    $( '.gmodal.active' ).gmodal( 'close' );
+                },
+
+                createShorthandTargets: function() {
+                    $( '.gmodal' ).each( function() {
+                        var modal         = $(this).removeClass( 'gmodal' ),
+                            triggers      = $( '.gmodal-trigger' ).filter( function() {
+                                                var trigger = $(this);
+                                                switch( trigger.attr( 'data-modal' ) ){
+                                                    case undefined: return false;
+                                                    case 'this':    return modal.find( trigger ).length > 0;
+                                                    case 'all':     return true;
+                                                    default:        return modal.is( trigger.attr( 'data-modal' ) );
+                                                }
+                                            }).removeClass( 'gmodal-trigger' ),
+                            closeTriggers = triggers.filter( '[data-action=close]' ),
+                            openTriggers  = triggers.not( '[data-action=close]' );
+
+                        modal.gmodal( { openTriggers: openTriggers, closeTriggers: closeTriggers } );
+                    });
+                },
+
+                hasWatchingTarget: function() {
+                    return $.gmodal.watchingTargets.length > 0;
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+                rebindKeypress: function() {
+                    $(document).off( 'keyup', $.gmodal.handlers.onKeypress );
+                    if( methods.hasWatchingTarget() ) {
+                        $(document).on( 'keyup', $.gmodal.handlers.onKeypress );
+                    }
+                },
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init':           methods.init();           break;
+            case 'closeAll':       methods.closeAll();       break;
+            case 'rebindKeypress': methods.rebindKeypress(); break;
+        }
+    };
+
+    $.gmodal.defaults = {
+        openOnReady:             false,
+        closeOnOverlayClick:     true,
+        closeOnEscapeKey:        true,
+        showCloseButton:         true,
+        disablePageScrollOnOpen: true,
+        singleModal:             false,
+        overlayColor:            'rgba(0,0,0,.9)',
+        offsetTop:               0,
+        effectType:              'slide',
+        effectDuration:          100,
+        effectEasing:            'linear',
+    };
+
+    $.gmodal.watchingTargets = [];
+
+    $.gmodal.handlers = {
+        onTriggerClick: function( event ) {
+            var trigger  = $( event.currentTarget ),
+                gmodal   = event.data.gmodal,
+                action   = event.data.action,
+                options  = gmodal.data( 'gmodal-options' ),
+                data     = { gmodal: gmodal, trigger: trigger, action: action };
+
+            $( document, gmodal, trigger ).trigger( 'gmodal.triggerclick', data );
+            if( options.onTriggerClick ){ options.onTriggerClick(); }
+            gmodal.gmodal( action );
+        },
+
+        onClick: function( event ) {
+            var gmodal  = $( event.currentTarget ),
+                options = gmodal.data( 'gmodal-options' ),
+                data    = { gmodal: gmodal };
+
+            $( document, gmodal ).trigger( 'gmodal.click', data );
+            if( options.onClick ){ options.onClick( data ); }
+            event.stopPropagation();
+        },
+
+        onOverlayClick: function( event ) {
+            var overlay  = $( event.currentTarget ),
+                gmodal   = overlay.children( '.gmodal' ),
+                options  = gmodal.data( 'gmodal-options' ),
+                data     = { gmodal: gmodal };
+
+            $( document, gmodal ).trigger( 'gmodal.overlayclick', data );
+            if( options.onOverlayClick ){ options.onOverlayClick( data ); }
+            event.stopPropagation();
+        },
+
+        onKeypress: function( event ) {
+            if( event.keyCode === 27 ) {
+                $( $.gmodal.watchingTargets ).gmodal( 'close' );
+            }
+        }
+    };
+
+    $.fn.gmodal = function( action, args ) {
+        return this.each( function() {
+            var methods = {
+                    afterClose: function(){
+                        gmodal.removeClass( 'active' )
+                              .css( 'width', '' )
+                              .css( 'height', '' )
+                              .off( 'click', $.gmodal.handlers.onModalClick );
+
+                        if( gmodal.parent().hasClass('gmodal-overlay') ){ gmodal.unwrap(); }
+
+                        if( !methods.hasActiveModal() ){ $.glib.enablePageScroll(); }
+                        methods.dispatchEvent( 'gmodal.hide', { gmodal: gmodal } );
+                    },
+
+                    afterOpen: function(){
+                        methods.dispatchEvent( 'gmodal.show', { gmodal: gmodal } );
+                    },
+
+                    close: function() {
+                        if( gmodal.hasClass( 'active' ) ) {
+                            methods.dispatchEvent( 'gmodal.close', { gmodal: gmodal } );
+
+                            if( options.effectType === 'slide' ) {
+                                gmodal.css( 'top', '0' )
+                                      .animate( { top: '-2000px' }, options.effectDuration, options.effectEasing, methods.afterClose );
+                            }
+                            else if( options.effectType === 'fade' ) {
+                                $( gmodal.parent( '.gmodal-overlay' ) ).css( 'opacity', 1 )
+                                                                       .animate( { opacity: 0 }, options.effectDuration, options.effectEasing, methods.afterClose );
+                            }
+                            else {
+                                methods.afterClose();
+                            }
+                        }
+                    },
+
+                    create: function() {
+                        methods.updateOptions();
+                        methods.createModal();
+
+                        methods.dispatchEvent( 'gmodal.create', { gmodal: gmodal } );
+                        $.glib.log( '[glib log] create gmodal: successful.' );
+                    },
+
+                    createCloseButton: function(){
+                        $( '<div class="gbtn-close"></div>' ).gmodalTrigger( { gmodal: gmodal, action: 'close' } )
+                                                             .appendTo( gmodal );
+                    },
+
+                    createModal: function(){
+                        gmodal.addClass( 'gmodal' );
+                        methods.createTriggers();
+
+                        if( options.openOnReady ) {
+                            methods.open();
+                        }
+
+                        if( options.closeOnEscapeKey && !methods.isWatching() ) {
+                            methods.watch();
+                            $.gmodal( 'rebindKeypress' );
+                        }
+
+                        if( options.showCloseButton && !methods.hasCloseButton() ) {
+                            methods.createCloseButton();
+                        }
+                    },
+
+                    createTriggers: function(){
+                        if( options.openTriggers ) { $( options.openTriggers ) .each( function(){ $(this).gmodalTrigger( { gmodal: gmodal, action: 'open' } ); }); }
+                        if( options.closeTriggers ){ $( options.closeTriggers ).each( function(){ $(this).gmodalTrigger( { gmodal: gmodal, action: 'close' } ); }); }
+                    },
+
+                    destory: function() {
+                        methods.destoryModal();
+
+                        methods.dispatchEvent( 'gmodal.destory', { gmodal: gmodal } );
+                        $.glib.log( '[glib log] destory gmodal: successful.' )
+                    },
+
+                    destoryModal: function(){
+                        methods.close();
+                        methods.removeCloseButton();
+                        methods.destoryTriggers();
+
+                        if( options.closeOnEscapeKey && methods.isWatching() ){
+                            methods.unwatch();
+                            $.gmodal( 'rebindKeypress' );
+                        }
+
+                        gmodal.removeData( 'gmodal-options' )
+                              .removeClass( 'gmodal' );
+                    },
+
+                    destoryTriggers: function(){
+                        $( '.gmodal-trigger' ).filter( function(){
+                            return $(this).data( 'gmodal' ).is( gmodal );
+                        }).gmodalTrigger( 'destory' );
+                    },
+
+                    dispatchEvent: function( event, data ) {
+                        $( document, gmodal ).trigger( event, data );
+                        switch( event ) {
+                            case 'gmodal.create':  if( options.onCreate )  { options.onCreate( data ); }  break;
+                            case 'gmodal.destory': if( options.onDestory ) { options.onDestory( data ); } break;
+                            case 'gmodal.update':  if( options.onUpdate )  { options.onUpdate( data ); }  break;
+                            case 'gmodal.open':    if( options.onOpen )    { options.onOpen( data ); }    break;
+                            case 'gmodal.show':    if( options.onShow)     { options.onShow( data ); }    break;
+                            case 'gmodal.close':   if( options.onClose )   { options.onClose( data ); }   break;
+                            case 'gmodal.hide':    if( options.onHide )    { options.onHide( data ); }    break;
+                        }
+                    },
+
+                    getShorthandOptions: function() {
+                        var shorthandOptions = {};
+                        if( gmodal.hasClass( 'open-on-ready' ) )      { shorthandOptions.openOnReady = true; }
+                        if( gmodal.hasClass( 'hide-close-button' ) )  { shorthandOptions.showCloseButton = false; }
+                        if( gmodal.hasClass( 'single-modal' ) )       { shorthandOptions.singleModal = false; }
+                        if( gmodal.attr( 'data-overlay-color' ) )     { shorthandOptions.overlayColor = gmodal.attr( 'data-overlay-color' ); }
+                        if( gmodal.attr( 'data-offset-top' ) )        { shorthandOptions.offsetTop = gmodal.attr( 'data-offset-top' ); }
+                        if( gmodal.attr( 'data-effect' ) == 'slide' ) { shorthandOptions.effectType = 'slide'; }
+                        if( gmodal.attr( 'data-effect' ) == 'fade' )  { shorthandOptions.effectType = 'fade'; }
+                        if( gmodal.attr( 'data-effect' ) == 'none' )  { shorthandOptions.effectType = 'none'; }
+                        if( gmodal.attr( 'data-effect-duration' ) )   { shorthandOptions.effectDuration = parseInt( gmodal.attr( 'data-effect-duration' ) ); }
+                        if( gmodal.attr( 'data-effect-easing' ) )     { shorthandOptions.effectEasing = gmodal.attr( 'data-effect-easing' ); }
+                        return shorthandOptions;
+                    },
+
+                    hasActiveModal: function(){
+                        return $( '.gmodal.active' ).length > 0;
+                    },
+
+                    hasCloseButton: function(){
+                        return gmodal.find( '.gbtn-close' ).length > 0;
+                    },
+
+                    isCreated: function(){
+                        return gmodal.hasClass( 'gmodal' );
+                    },
+
+                    isWatching: function(){
+                        return $.gmodal.watchingTargets.indexOf( gmodal ) != -1;
+                    },
+
+                    isNewInstance: function(){
+                        if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                            args = action;
+                            action = 'create';
+                        }
+
+                        return action === 'create';
+                    },
+
+                    load: function(){
+                        if( methods.isNewInstance() ) {
+                            if( methods.isCreated() ){
+                                $.glib.log( '[glib log] create gmodal: failed - gmodal already created.' );
+                                exit = true;
+                            }
+                            else {
+                                options = $.extend( {}, $.gmodal.defaults, methods.getShorthandOptions(), args );
+                            }
+                        }
+                        else {
+                            if( methods.isCreated() ){
+                                if( action === 'options' ){
+                                    if( args ){
+                                        options = $.extend( {}, gmodal.data( 'gmodal-options' ), args );
+                                    }
+                                    else {
+                                        $.glib.log( '[glib log] update gmodal options: failed - options not defined.' );
+                                        exit = true;
+                                    }
+                                }
+                                else {
+                                    options = gmodal.data( 'gmodal-options' );
+                                }
+                            }
+                            else {
+                                $.glib.log( '[glib log] gmodal: command "' + action + '" failed - gmodal never created.' );
+                                exit = true;
+                            }
+                        }
+                    },
+
+                    open: function() {
+                        if( !gmodal.hasClass( 'active' ) ) {
+                            methods.dispatchEvent( 'gmodal.open', { gmodal: gmodal } );
+
+                            if( options.singleModal ) { $.gmodal( 'closeAll' ); }
+                            if( options.disablePageScrollOnOpen ) { $.glib.disablePageScroll(); }
+
+                            gmodal.css( 'width', gmodal.outerWidth() )
+                                  .css( 'height', gmodal.outerHeight() )
+                                  .on( 'click', $.gmodal.handlers.onClick )
+                                  .wrap( '<div class="gmodal-overlay"></div>' )
+                                  .addClass( 'active' )
+                            .parent( '.gmodal-overlay' )
+                                  .css( 'backgroundColor', options.overlayColor )
+                                  .css( 'top', options.offsetTop + 'px' )
+                                  .on( 'click', $.gmodal.handlers.onOverlayClick );
+
+                            if( options.closeOnOverlayClick ){ gmodal.parent( '.gmodal-overlay' ).gmodalTrigger( { gmodal: gmodal, action: 'close' } ); }
+
+                            if( options.effectType === 'slide' ) {
+                                gmodal.css( 'top', '-2000px' )
+                                      .animate( { top: 0 }, options.effectDuration, options.effectEasing, methods.afterOpen );
+                            }
+                            else if( options.effectType === 'fade' ) {
+                                $( gmodal.parent( '.gmodal-overlay' ) ).css( 'opacity', 0 )
+                                                                       .animate( { opacity: 1 }, options.effectDuration, options.effectEasing, methods.afterOpen );
+                            }
+                            else {
+                                methods.afterOpen();
+                            }
+                        }
+                    },
+
+                    removeCloseButton: function(){
+                        gmodal.find( '.gbtn-close' ).remove();
+                    },
+
+                    unwatch: function() {
+                        var index = $.gmodal.watchingTargets.indexOf( gmodal );
+                        $.gmodal.watchingTargets.splice( index, 1 );
+                    },
+
+                    update: function() {
+                        if( options.closeOnEscapeKey && !methods.isWatching() ) {
+                            methods.watch();
+                            $.gmodal( 'rebindKeypress' );
+                        }
+
+                        if( !options.closeOnEscapeKey && methods.isWatching() ){
+                            methods.unwatch();
+                            $.gmodal( 'rebindKeypress' );
+                        }
+
+                        if( options.showCloseButton && !methods.hasCloseButton() ){ methods.createCloseButton(); }
+                        if( !options.showCloseButton && methods.hasCloseButton() ){ methods.removeCloseButton(); }
+
+                        if( gmodal.hasClass( 'active' ) ){
+                            if( options.closeOnOverlayClick && !gmodal.parent( '.gmodal-overlay' ).hasClass('.gmodal-trigger') ){ gmodal.parent( '.gmodal-overlay' ).gmodalTrigger( { gmodal: gmodal, action: 'close' } ); }
+                            if( !options.closeOnOverlayClick && gmodal.parent( '.gmodal-overlay' ).hasClass('.gmodal-trigger') ){ gmodal.parent( '.gmodal-overlay' ).gmodalTrigger( 'destroy' ); }
+
+                            if( options.singleModal ){ $('.gmodal.active').not( gmodal ).gmodal( 'close' ); }
+                            if( options.disablePageScrollOnOpen ){ $.glib.disablePageScroll(); }
+                            if( !options.disablePageScrollOnOpen ){ $.glib.enablePageScroll(); }
+
+                            gmodal.parent( '.gmodal-overlay' )
+                                  .css( 'backgroundColor', options.overlayColor )
+                                  .css( 'top', options.offsetTop + 'px' );
+                        }
+
+                        methods.dispatchEvent( 'gmodal.update', { gmodal: gmodal } );
+                        $.glib.log( '[glib log] update gmodal: successful.' );
+                    },
+
+                    updateOptions: function() {
+                        gmodal.data( 'gmodal-options', options );
+                    },
+
+                    watch: function(){
+                        $.gmodal.watchingTargets.push( gmodal );
+                    },
+
+                };
+
+            var gmodal = $(this),
+                options,
+                exit = false;
+
+            if( gmodal.length == 0 ){
+                $.glib.log( '[glib log] gmodal: target element not found.' );
+            }
+            else if( gmodal.length == 1 ){
+                methods.load();
+
+                if( !exit ){
+                    switch( action ) {
+                        case 'create':  methods.create();        break;
+                        case 'destory': methods.destory();       break;
+                        case 'options': methods.updateOptions(); break;
+                        case 'update':  methods.update();        break;
+                        case 'open':    methods.open();          break;
+                        case 'close':   methods.close();         break;
+                        default:        $.glib.log( '[glib log] gmodal: command "' + action + '" not found.' );
+                    }
+                }
+            }
+            else {
+                gmodal.each( function(){
+                    $(this).gmodal( action, args );
+                });
+            }
+        });
+    };
+
+    $.fn.gmodalTrigger = function( action, args ) {
+        return this.each( function() {
+            var methods = {
+                create: function(){
+                    if( options.gmodal.length > 0 ) {
+                        gtrigger.addClass( 'gmodal-trigger' )
+                                .data( 'gmodal', options.gmodal )
+                                .on( 'click', options, $.gmodal.handlers.onTriggerClick );
+                    }
+                    else {
+                        $.glib.log( '[glib log] create gmodal trigger: failed - gmodal is not defined.' );
+                    }
+                },
+
+                destory: function(){
+                    gtrigger.removeClass( 'gmodal-trigger' )
+                            .removeData( 'gmodal' )
+                            .off( 'click', $.gmodal.handlers.onTriggerClick );
+                },
+
+                isCreated: function(){
+                    return gtrigger.hasClass( 'gmodal-trigger' );
+                },
+
+                isNewInstance: function(){
+                    if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                        args = action;
+                        action = 'create';
+                    }
+
+                    return action === 'create';
+                },
+
+                load: function(){
+                    if( methods.isNewInstance() ) {
+                        if( methods.isCreated() ){
+                            $.glib.log( '[glib log] create gmodal trigger: failed - gmodal trigger already created.' );
+                            exit = true;
+                        }
+                        else {
+                            options = args;
+                            if( !options.action ){ options.action = 'open'; }
+                        }
+                    }
+                    else {
+                        if( !methods.isCreated() ){
+                            $.glib.log( '[glib log] gtrigger: command "' + action + '" failed - gmodal trigger never created.' );
+                            exit = true;
+                        }
+                    }
+                },
+            };
+
+            var gtrigger = $(this),
+                options,
+                exit = false;
+
+            if( gtrigger.length == 0 ){
+                $.glib.log( '[glib log] gmodal trigger: target element not found.' );
+            }
+            else if( gtrigger.length == 1 ){
+                methods.load();
+
+                if( !exit ){
+                    switch( action ) {
+                        case 'create':  methods.create();        break;
+                        case 'destory': methods.destory();       break;
+                        default:        $.glib.log( '[glib log] gtrigger: command "' + action + '" not found.' );
+                    }
+                }
+            }
+            else {
+                gtrigger.each( function(){
+                    $(this).gtrigger( action, args );
+                });
+            }
+
+        });
+    };
+
+    $.gcountdown = function( action ) {
+        var methods = {
+                createShorthandTargets: function() {
+                    $( '.gcountdown[data-finish-date]' ).each( function(){
+                        var countdown = $(this).removeClass( 'gcountdown' );
+                        countdown.gcountdown( { finishDate: $(this).attr( 'data-finish-date' ) } );
+                    });
+                },
+
+                hasWatchingTarget: function() {
+                    return $.gcountdown.watchingTargets.length > 0;
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+                rebindTimer: function() {
+                    clearInterval( $.gcountdown.timer );
+                    if( methods.hasWatchingTarget() ) {
+                        $.gcountdown.timer = setInterval( $.gcountdown.handlers.onTimer, 1000 );
+                    }
+                },
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init':        methods.init();        break;
+            case 'rebindTimer': methods.rebindTimer(); break;
+        }
+    };
+
+    $.gcountdown.watchingTargets = [];
+
+    $.gcountdown.defaults = {
+        labelType:   'none',
+        showDays:    true,
+        showHours:   true,
+        showMinutes: true,
+        showSeconds: true,
+    };
+
+    $.gcountdown.handlers = {
+        onTimer: function(){
+            $( $.gcountdown.watchingTargets ).gcountdown( 'refresh' );
+        },
+    };
+
+    $.fn.gcountdown = function( action ) {
+        return this.each( function() {
+            var methods = {
+                    create: function() {
+                        if( options.finishDate ) {
+                            methods.updateOptions();
+                            methods.createCountdown();
+
+                            methods.dispatchEvent( 'gcountdown.create', { gcountdown: gcountdown } );
+                            $.glib.log( '[glib log] create gcountdown: successful.' );
+                        }
+                        else {
+                             $.glib.log( '[glib log] create gcountdown: failed - finish date not defined.' );
+                        }
+                    },
+
+                    createCountdown: function() {
+                        gcountdown.addClass( 'gcountdown' );
+
+                        methods.refreshDisplay();
+                        methods.start();
+                    },
+
+                    destory: function() {
+                        methods.destoryModal();
+
+                        methods.dispatchEvent( 'gcountdown.destory', { gcountdown: gcountdown } );
+                        $.glib.log( '[glib log] destory gcountdown: successful.' )
+                    },
+
+                    destoryCountdown: function() {
+                        methods.stop();
+                        methods.unwatch();
+
+                        gcountdown.removeData( 'gcountdown-options' )
+                                  .removeClass( 'gcountdown' )
+                                  .children( '.gcountdown-unit' ).remove();
+                    },
+
+                    dispatchEvent: function( event, data ) {
+                        $( document, gcountdown ).trigger( event, data );
+                        switch( event ) {
+                            case 'gcountdown.create':  if( options.onCreate )  { options.onCreate( data ); }  break;
+                            case 'gcountdown.destory': if( options.onDestory ) { options.onDestory( data ); } break;
+                            case 'gcountdown.update':  if( options.onUpdate )  { options.onDestory( data ); } break;
+                            case 'gcountdown.start':   if( options.onStart )   { options.onStart( data ); }   break;
+                            case 'gcountdown.stop':    if( options.onStop )    { options.onStop( data ); }    break;
+                            case 'gcountdown.finish':  if( options.onFinish )  { options.onFinish( data ); }  break;
+                        }
+                    },
+
+                    finish: function(){
+                        methods.stop();
+                        gcountdown.children( '.gcountdown-unit' ).html( '00' );
+
+                        methods.dispatchEvent( 'gcountdown.finish', { gcountdown: gcountdown } );
+                    },
+
+                    getShorthandOptions: function() {
+                        var shorthandOptions = {};
+                        if( gcountdown.attr( 'data-finish-date' ) ) { shorthandOptions.finishDate  = gcountdown.attr( 'data-finish-date' ); }
+                        if( gcountdown.attr( 'data-label-type' ) )  { shorthandOptions.labelType   = gcountdown.attr( 'data-label-type' ); }
+                        if( gcountdown.hasClass( 'hide-days' ) )    { shorthandOptions.showDays    = false; }
+                        if( gcountdown.hasClass( 'hide-Hours' ) )   { shorthandOptions.showHours   = false; }
+                        if( gcountdown.hasClass( 'hide-Minutes' ) ) { shorthandOptions.showMinutes = false; }
+                        if( gcountdown.hasClass( 'hide-Seconds' ) ) { shorthandOptions.showSeconds = false; }
+                        return shorthandOptions;
+                    },
+
+                    isCreated: function() {
+                        return gcountdown.hasClass( 'gcountdown' );
+                    },
+
+                    isNewInstance: function() {
+                        if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                            args = action;
+                            action = 'create';
+                        }
+
+                        return action === 'create';
+                    },
+
+                    load: function(){
+                        if( methods.isNewInstance() ) {
+                            if( methods.isCreated() ){
+                                $.glib.log( '[glib log] create gcountdown: failed - gcountdown already created.' );
+                                exit = true;
+                            }
+                            else {
+                                options = $.extend( {}, $.gcountdown.defaults, methods.getShorthandOptions(), args );
+                            }
+                        }
+                        else {
+                            if( methods.isCreated() ){
+                                if( action === 'options' ){
+                                    if( args ){
+                                        options = $.extend( {}, gcountdown.data( 'gcountdown-options' ), args );
+                                    }
+                                    else {
+                                        $.glib.log( '[glib log] update gcountdown options: failed - options not defined.' );
+                                        exit = true;
+                                    }
+                                }
+                                else {
+                                    options = gcountdown.data( 'gcountdown-options' );
+                                }
+                            }
+                            else {
+                                $.glib.log( '[glib log] gcountdown: command "' + action + '" failed - gcountdown never created.' );
+                                exit = true;
+                            }
+                        }
+                    },
+
+                    start: function(){
+                        methods.refresh();
+                        methods.watch();
+                        $.gcountdown( 'rebindTimer' );
+                        methods.dispatchEvent( 'gcountdown.start', { gcountdown: gcountdown } );
+                    },
+
+                    stop: function(){
+                        methods.unwatch();
+                        $.gcountdown( 'rebindTimer' );
+                        methods.dispatchEvent( 'gcountdown.stop', { gcountdown: gcountdown } );
+                    },
+
+                    refresh: function(){
+                        var now        = new Date(),
+                            finishTime = new Date( options.finishDate ),
+                            passedTime = ( ( finishTime.getTime() - now.getTime() ) / 1000 ).toFixed( 0 );
+
+                        if( passedTime > 0 ){
+                            var passedDays = Math.floor( passedTime / (3600 * 24) ).toFixed(0),
+                                passedHrs  = Math.floor( passedTime / (60 * 60) % 24 ).toFixed(0),
+                                passedMins = Math.floor( passedTime / 60 % 60 ).toFixed(0),
+                                passedSecs = Math.floor( passedTime % 60 ).toFixed(0);
+
+                            gcountdown.children('.gcountdown-days').html( $.glib.pad( passedDays, 2 ) );
+                            gcountdown.children('.gcountdown-hrs').html( $.glib.pad( passedHrs, 2 ) );
+                            gcountdown.children('.gcountdown-mins').html( $.glib.pad( passedMins, 2 ) );
+                            gcountdown.children('.gcountdown-secs').html( $.glib.pad( passedSecs, 2 ) );
+                        }
+                        else {
+                            methods.finish();
+                        }
+                    },
+
+                    refreshDisplay: function(){
+                        gcountdown.find( '.gcountdown-unit' ).remove();
+                        gcountdown.append( options.showDays    ? '<div class="gcountdown-unit gcountdown-days">00</div>' : '' )
+                                  .append( options.showHours   ? '<div class="gcountdown-unit gcountdown-hrs">00</div>'  : '' )
+                                  .append( options.showMinutes ? '<div class="gcountdown-unit gcountdown-mins">00</div>' : '' )
+                                  .append( options.showSeconds ? '<div class="gcountdown-unit gcountdown-secs">00</div>' : '' );
+                    },
+
+                    unwatch: function() {
+                        var index = $.gcountdown.watchingTargets.indexOf( gcountdown );
+                        $.gcountdown.watchingTargets.splice( index, 1 );
+                    },
+
+                    update: function() {
+                        methods.refreshDisplay();
+                        methods.refresh();
+                    },
+
+                    updateOptions: function() {
+                        gcountdown.data( 'gcountdown-options', options );
+                    },
+
+                    watch: function() {
+                        $.gcountdown.watchingTargets.push( gcountdown );
+                    },
+                };
+
+            var gcountdown = $(this),
+                options,
+                exit = false;
+
+            if( gcountdown.length == 0 ){
+                $.glib.log( '[glib log] gcountdown: target element not found.' );
+            }
+            else if ( gcountdown.length == 1 ){
+                methods.load();
+
+                if( !exit ){
+                    switch( action ) {
+                        case 'create':  methods.create();        break;
+                        case 'destory': methods.destory();       break;
+                        case 'options': methods.updateOptions(); break;
+                        case 'update':  methods.update();        break;
+                        case 'refresh': methods.refresh();       break;
+                        case 'start':   methods.start();         break;
+                        case 'stop':    methods.stop();          break;
+                        case 'finish':  methods.finish();        break;
+                        default:        $.glib.log( '[glib log] gcountdown: command "' + action + '" not found.' );
+                    }
+                }
+            }
+            else {
+                gcountdown.each( function(){
+                    $(this).gcountdown( action, args );
+                });
+            }
+        });
+    };
+
+    $.gstickup = function( action ) {
+        var methods = {
+                createShorthandTargets: function() {
+                    $( '.gstickup' ).each( function(){
+                        $(this).removeClass( 'gstickup' ).gstickup();
+                    });
+                },
+
+                hasWatchingTarget: function() {
+                    return $.gstickup.watchingTargets.length > 0;
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+                rebindScroll: function() {
+                    $( window ).off( 'scroll', $.gstickup.handlers.onScroll );
+                    if( methods.hasWatchingTarget() ) {
+                        $( window ).on( 'scroll', $.gstickup.handlers.onScroll );
+                    }
+                },
+
+                resetAll: function() {
+                    $( $.gstickup.watchingTargets ).gstickup( 'reset' );
+                },
+
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init':          methods.init();         break;
+            case 'rebindScroll':  methods.rebindScroll(); break;
+            case 'resetAll':      methods.resetAll();     break;
+        }
+    };
+
+    $.gstickup.watchingTargets = [];
+
+    $.gstickup.defaults = {
+        offset: 0,
+    };
+
+    $.gstickup.handlers = {
+        onScroll: function() {
+            $( $.gstickup.watchingTargets ).gstickup( 'refresh' );
+        },
+    };
+
+    $.fn.gstickup = function( action ) {
+        return this.each( function() {
+            var methods = {
+                    create: function() {
+                        stickup.data( 'gstickup-settings', settings );
+                        if( !methods.isCreated() ) {
+                            methods.watch();
+
+                            stickup.data( 'original-top', stickup.offset().top )
+                                   .addClass( 'gstickup' );
+
+                            methods.dispatchEvent( 'gstickup.create', data );
+                            methods.refresh();
+                            $.gstickup( 'rebindScroll' );
+                        }
+                    },
+
+                    destory: function() {
+                        methods.unwatch();
+
+                        stickup.removeData( 'gstickup-settings' )
+                               .removeData( 'original-top' )
+                               .removeClass( 'gstickup' );
+
+                        methods.unstick();
+                        methods.dispatchEvent( 'gstickup.destory', data );
+                        $.gstickup( 'rebindScroll' );
+                    },
+
+                    dispatchEvent: function( event, data ) {
+                        $( document, stickup ).trigger( event, data );
+                        switch( event ) {
+                            case 'gstickup.create':  if( settings.onCreate )  { settings.onCreate( data ); }  break;
+                            case 'gstickup.destory': if( settings.onDestory ) { settings.onDestory( data ); } break;
+                            case 'gstickup.stick':   if( settings.onStick )   { settings.onStick( data ); }   break;
+                            case 'gstickup.unstick': if( settings.onUnstick ) { settings.onUnstick( data ); } break;
+                        }
+                    },
+
+                    isCreated: function() {
+                        return stickup.hasClass( 'gstickup' );
+                    },
+
+                    isNewInstance: function() {
+                        return $.type( action ) === 'undefined' || $.type( action ) === 'object';
+                    },
+
+                    isReached: function() {
+                        return $.glib.getPageTopHeight() > stickup.data( 'original-top' ) - settings.offset;
+                    },
+
+                    loadSettings: function(){
+                        if( methods.isNewInstance() ) {
+                            options  = action,
+                            action   = 'create',
+                            settings = $.extend( {}, $.gstickup.defaults, options );
+                            methods.loadShorthandSettings();
+                        }
+                        else {
+                            settings = stickup.data( 'gstickup-settings' );
+                        }
+                    },
+
+                    loadShorthandSettings: function() {
+                        if( stickup.attr( 'data-offset' ) ) { settings.offset = parseInt( stickup.attr( 'data-offset' ) ); }
+                    },
+
+                    refresh: function() {
+                        methods.isReached() ? methods.stick() : methods.unstick();
+                    },
+
+                    reset: function() {
+                        methods.unstick();
+                        stickup.data( 'original-top', stickup.offset().top );
+                        methods.refresh();
+                    },
+
+                    stick: function() {
+                        stickup.css( 'width', stickup.outerWidth() )
+                               .css( 'top', settings.offset )
+                               .css( 'left', stickup.offset().left )
+                               .css( 'position', 'fixed' )
+                               .addClass( 'sticked' );
+                        methods.dispatchEvent( 'gstickup.stick', data );
+                    },
+
+                    unstick: function() {
+                        stickup.css( 'width', '' )
+                               .css( 'position', '' )
+                               .css( 'top', '' )
+                               .css( 'left', '' )
+                               .removeClass( 'sticked' );
+                        methods.dispatchEvent( 'gstickup.unstick', data );
+                    },
+
+                    unwatch: function() {
+                        var index = $.gstickup.watchingTargets.indexOf( stickup );
+                        $.gstickup.watchingTargets.splice( index, 1 );
+                    },
+
+                    watch: function() {
+                        $.gstickup.watchingTargets.push( stickup );
+                    },
+                };
+
+            var options,
+                settings,
+                stickup = $(this),
+                data    = { stickup: stickup };
+
+            if( stickup.length > 0 ){
+                methods.loadSettings();
+
+                switch( action ) {
+                    case 'create':  methods.create();  break;
+                    case 'destory': methods.destory(); break;
+                    case 'stick':   methods.stick();   break;
+                    case 'unstick': methods.unstick(); break;
+                    case 'refresh': methods.refresh(); break;
+                    case 'reset':   methods.reset();   break;
+                }
+            }
+        });
+    };
+
+    $.gscrollspy = function( action ) {
+        var methods = {
+                createShorthandTargets: function() {
+                    $( '.gscrollspy' ).each( function() {
+                        var scrollspy = $(this).removeClass( 'gscrollspy' ),
+                            items     = scrollspy.children( 'li[data-target]' ),
+                            targets   = items.map( function() {
+                                return $( $(this).attr( 'data-target' ) ).get();
+                            });
+                        scrollspy.gscrollspy( { items: items, targets: targets } );
+                    });
+                },
+
+                hasWatchingTarget: function() {
+                    return $.gscrollspy.watchingTargets.length > 0;
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+                rebindScroll: function() {
+                    $( window ).off( 'scroll', $.gscrollspy.handlers.onScroll );
+                    if( methods.hasWatchingTarget() ) {
+                        $( window ).on( 'scroll', $.gscrollspy.handlers.onScroll );
+                    }
+                },
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init':         methods.init();         break;
+            case 'rebindScroll': methods.rebindScroll(); break;
+        }
+    };
+
+    $.gscrollspy.watchingTargets = [];
+
+    $.gscrollspy.defaults = {
+        triggerOnHover:  false,
+        scrollDuration:  200,
+        scrollEasing:    'linear',
+        scrollOffset:    30,
+        activateOffset:  10,
+    };
+
+    $.gscrollspy.handlers = {
+        onTrigger: function( event ) {
+            var item      = $( event.currentTarget )
+                scrollspy = item.parent( 'ul' ).data( 'triggeredItem', item );
+
+                scrollspy.gscrollspy( 'scroll' );
+        },
+
+        onScroll: function() {
+            $( $.gscrollspy.watchingTargets ).gscrollspy( 'refresh' );
+        },
+    };
+
+    $.fn.gscrollspy = function( action ) {
+        return this.each( function() {
+            var methods = {
+                    create: function() {
+                        if( targets && ( items.length == targets.length ) ) {
+                            scrollspy.data( 'gscrollspy-settings', settings );
+
+                            if( !methods.isCreated() ) {
+                                scrollspy.data( 'gscrollspy-settings', settings )
+                                         .addClass( 'gscrollspy' );
+                                methods.watch();
+
+                                items.on( settings.triggerOnHover ? 'mouseenter ' : 'click', $.gscrollspy.handlers.onTrigger );
+
+                                methods.dispatchEvent( 'gscrollspy.create', data );
+                                methods.refresh();
+                                $.gscrollspy( 'rebindScroll' );
+                            }
+                        }
+                    },
+
+                    destory: function() {
+                        methods.unwatch();
+
+                        scrollspy.removeData( 'gscrollspy-settings' )
+                                 .removeClass( 'gscrollspy' );
+
+                        items.off( settings.triggerOnHover ? 'mouseenter ' : 'click', $.gscrollspy.handlers.onTrigger )
+                             .removeClass( 'active' );
+
+                        methods.dispatchEvent( 'gscrollspy.destory', data );
+                        $.gscrollspy( 'rebindScroll' );
+                    },
+
+                    dispatchEvent: function( event, data ) {
+                        $( document, scrollspy, data.item, data.target ).trigger( event, data );
+                        switch( event ) {
+                            case 'gscrollspy.create':        if( settings.onCreate )        { settings.onCreate( data ); }        break;
+                            case 'gscrollspy.destory':       if( settings.onDestory )       { settings.onDestory( data ); }       break;
+                            case 'gscrollspy.alltargetsout': if( settings.onAllTargetsOut ) { settings.onAllTargetsOut( data ); } break;
+                            case 'gscrollspy.targetin':      if( settings.onTargetIn )      { settings.onTargetIn( data ); }      break;
+                            case 'gscrollspy.targetout':     if( settings.onTargetOut )     { settings.onTargetOut( data ); }     break;
+                            case 'gscrollspy.trigger':       if( settings.onTrigger )       { settings.onTrigger( data ); }       break;
+                            case 'gscrollspy.scroll':        if( settings.onScroll )        { settings.onScroll( data ); }        break;
+                        }
+                    },
+
+                    getInData: function() {
+                        var inTarget = $.glib.isPageScrolledToBottom()
+                                     ? targets.eq( -1 )
+                                     : targets.filter( function() { return methods.isTargetReached( $(this) ); } ).eq( -1 ),
+                            inIndex  = ( targets.index( inTarget ) == -1 )
+                                     ? 0
+                                     : targets.index( inTarget ),
+                            inItem   = items.eq( inIndex );
+                        return $.extend( {}, data, { index: inIndex, item: inItem, target: inTarget } );
+                    },
+
+                    getActiveData: function() {
+                        var activeItem   = items.filter( '.active' ),
+                            activeIndex  = items.index( activeItem ),
+                            activeTarget = targets.eq( activeIndex );
+                        return $.extend( {}, data, { index: activeIndex, item: activeItem, target: activeTarget } );
+                    },
+
+                    getScrollData: function() {
+                        var scrollItem   = scrollspy.data( 'triggeredItem' ),
+                            scrollIndex  = items.index( scrollItem ),
+                            scrollTarget = targets.eq( scrollIndex );
+                        return $.extend( {}, data, { index: scrollIndex, item: scrollItem, target: scrollTarget } );
+                    },
+
+                    hasInTarget: function() {
+                        return methods.isTargetReached( targets.eq( 0 ) );
+                    },
+
+                    hasActiveTarget: function() {
+                        return items.filter( '.active' ).length > 0;
+                    },
+
+                    isCreated: function() {
+                        return scrollspy.hasClass( 'gscrollspy' );
+                    },
+
+                    isTargetReached: function( target ) {
+                        return $.glib.getPageTopHeight() + settings.scrollOffset + settings.activateOffset > target.offset().top;
+                    },
+
+                    isAllTargetsOut: function() {
+                        var firstTargetTopHeight   = targets.eq( 0 ).offset().top,
+                            lastTargetBottomHeight = targets.eq( -1 ).offset().top + targets.eq( -1 ).outerHeight();
+
+                        return ( $.glib.getPageBottomHeight() < firstTargetTopHeight )
+                            || ( $.glib.getPageTopHeight() > lastTargetBottomHeight );
+                    },
+
+                    isNewInstance: function() {
+                        return $.type( action ) === 'undefined' || $.type( action ) === 'object';
+                    },
+
+                    loadSettings: function(){
+                        if( methods.isNewInstance() ) {
+                            options  = action,
+                            action   = 'create',
+                            settings = $.extend( {}, $.gscrollspy.defaults, options ),
+                            methods.loadShorthandSettings();
+                        }
+                        else {
+                            settings = scrollspy.data( 'gscrollspy-settings' );
+                        }
+                    },
+
+                    loadShorthandSettings: function() {
+                        if( scrollspy.hasClass( 'trigger-on-hover' ) ) { settings.triggerOnHover = true; }
+                        if( scrollspy.attr( 'data-scroll-duration' ) ) { settings.scrollDuration = parseInt( scrollspy.attr( 'data-scroll-duration' ) ); }
+                        if( scrollspy.attr( 'data-scroll-easing' ) )   { settings.scrollEasing   = parseInt( scrollspy.attr( 'data-scroll-easing' ) ); }
+                        if( scrollspy.attr( 'data-scroll-offset' ) )   { settings.scrollOffset   = parseInt( scrollspy.attr( 'data-scroll-offset' ) ); }
+                        if( scrollspy.attr( 'data-activate-offset' ) ) { settings.activateOffset = parseInt( scrollspy.attr( 'data-activate-offset' ) ); }
+                    },
+
+                    refresh: function() {
+                        if( methods.isAllTargetsOut() ) {
+                            methods.dispatchEvent( 'gscrollspy.alltargetsout', data );
+
+                            if( methods.hasActiveTarget() ) {
+                                var activeData = methods.getActiveData();
+                                activeData.item.removeClass( 'active' );
+                                methods.dispatchEvent( 'gscrollspy.targetout', activeData );
+                            }
+                        }
+                        else {
+                            var inData = methods.getInData();
+
+                            if( !inData.item.hasClass('active') ) {
+                                if( methods.hasActiveTarget() ) {
+                                    var activeData = methods.getActiveData();
+                                    activeData.item.removeClass( 'active' );
+                                    methods.dispatchEvent( 'gscrollspy.targetout', activeData );
+                                }
+
+                                inData.item.addClass('active');
+                                methods.dispatchEvent( 'gscrollspy.targetin', inData );
+                            }
+                        }
+                    },
+
+                    scroll: function() {
+                        var scrollData = methods.getScrollData();
+                        methods.dispatchEvent( 'gscrollspy.trigger', scrollData );
+
+                        $.glib.scrollTo( scrollData.target, settings.scrollOffset, settings.scrollDuration, settings.scrollEasing, function() {
+                            scrollspy.removeData( 'triggeredItem' );
+                            methods.dispatchEvent( 'gscrollspy.scroll', scrollData );
+                        });
+                    },
+
+                    unwatch: function() {
+                        var index = $.gscrollspy.watchingTargets.indexOf( scrollspy );
+                        $.gscrollspy.watchingTargets.splice( index, 1 );
+                    },
+
+                    watch: function() {
+                        $.gscrollspy.watchingTargets.push( scrollspy );
+                    },
+            };
+
+            var options,
+                settings,
+                scrollspy = $(this),
+                items     = scrollspy.children('li'),
+                data      = { scrollspy: scrollspy },
+                targets;
+
+            if( scrollspy.length > 0 ){
+                methods.loadSettings();
+                if( settings.items ){ items = settings.items; }
+                targets = settings.targets;
+
+                switch( action ) {
+                    case 'create':   methods.create();          break;
+                    case 'destory':  methods.destory();         break;
+                    case 'refresh':  methods.refresh();         break;
+                    case 'scroll':   methods.scroll();          break;
+                }
+            }
+        });
+    };
+
+    $.gcoverflow = function( action ) {
+        var methods = {
+                createShorthandTargets: function() {
+                    $( '.gcoverflow' ).each( function(){
+                        var coverflow = $(this),
+                            triggers  = $( '.gcoverflow-trigger' ).filter( function() {
+                                            var trigger = $(this);
+                                            switch( trigger.attr( 'data-coverflow' ) ){
+                                                case undefined: return false;
+                                                default:        return coverflow.is( trigger.attr( 'data-coverflow' ) );
+                                            }
+                                        }).removeClass( 'gcoverflow-trigger' ),
+                        prevTriggers = triggers.filter( '.go-prev' ),
+                        nextTriggers  = triggers.filter( '.go-next' );
+
+                        coverflow.removeClass( 'gcoverflow' ).gcoverflow({ prevTriggers: prevTriggers, nextTriggers: nextTriggers });
+                    });
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init': methods.init(); break;
+        }
+    };
+
+    $.gcoverflow.defaults = {
+        offsetsX:       [100],
+        offsetsY:       [0],
+        offsetsOpacity: [1],
+        offsetsScale:   [1],
+        numVisible:     'all',
+    };
+
+    $.gcoverflow.handlers = {
+        onTriggerClick: function( event ) {
+            var trigger =   $( event.currentTarget ),
+                coverflow = event.data.coverflow,
+                action =    event.data.action,
+                settings =  coverflow.data( 'gcoverflow-settings' ),
+                data     =  { coverflow: coverflow, trigger: trigger, action: action };
+
+            $( document, coverflow, trigger ).trigger( 'gcoverflow.triggerclick', data );
+            if( settings.onTriggerClick ){ settings.onTriggerClick(); }
+            coverflow.gcoverflow( action );
+        },
+    };
+
+    $.fn.gcoverflow = function( action ) {
+        return this.each( function() {
+            var methods = {
+                    create: function() {
+                        coverflow.data( 'gcoverflow-settings', settings );
+                        if( !methods.isCreated() ) {
+                            coverflow.addClass( 'gcoverflow' );
+
+                            methods.dispatchEvent( 'gcoverflow.create', data );
+                            methods.goToFirst();
+                        }
+
+                        if( settings.prevTriggers ){ $( settings.prevTriggers ).each( function(){ $(this).gcoverflowTrigger( { coverflow: coverflow, action: 'prev' } ); }); }
+                        if( settings.nextTriggers ){ $( settings.nextTriggers ).each( function(){ $(this).gcoverflowTrigger( { coverflow: coverflow, action: 'next' } ); }); }
+                    },
+
+                    destory: function() {
+                        methods.reset();
+
+                        coverflow.removeData( 'gcoverflow-settings' )
+                                 .removeClass( 'gcoverflow' );
+
+                        methods.dispatchEvent( 'gcoverflow.destory', data );
+                    },
+
+                    dispatchEvent: function( event, data ) {
+                        $( document, coverflow ).trigger( event, data );
+                        switch( event ) {
+                            case 'gcoverflow.create':    if( settings.onCreate )    { settings.onCreate( data ); }    break;
+                            case 'gcoverflow.destory':   if( settings.onDestory )   { settings.onDestory( data ); }   break;
+                            case 'gcoverflow.targetin':  if( settings.onTargetIn )  { settings.onTargetIn( data ); }  break;
+                            case 'gcoverflow.targetout': if( settings.onTargetOut ) { settings.onTargetOut( data ); } break;
+                        }
+                    },
+
+                    getActiveIndex: function() {
+                        return items.index( items.filter('.active') );
+                    },
+
+                    goTo: function( index ) {
+                        methods.reset();
+
+                        if( settings.numVisible == "all" ){ settings.numVisible = items.length }
+                        if( settings.numVisible <= items.length && settings.numVisible % 2 ){
+                            var topmost = ( settings.numVisible + 1 ) / 2,
+                                loops = ( settings.numVisible - 1 ) / 2;
+
+                            items.eq( index ).addClass( 'active' )
+                                             .css( 'opacity', 1 )
+                                             .css('z-index', topmost );
+
+                            for( var i = 1; i <= loops; i++ ){
+                                var opacity = settings.offsetsOpacity[ i - 1 ] || settings.offsetsOpacity[ settings.offsetsOpacity.length - 1 ],
+                                    scale   = settings.offsetsScale[ i - 1 ] || settings.offsetsScale[ settings.offsetsScale.length - 1 ],
+                                    x       = settings.offsetsX[ i - 1 ] || settings.offsetsX[ settings.offsetsX.length - 1 ],
+                                    y       = settings.offsetsY[ i - 1 ] || settings.offsetsY[ settings.offsetsY.length - 1 ];
+
+                                items.eq( ( index + i ) % items.length ).css('z-index', topmost - i )
+                                                                        .css( 'opacity', opacity )
+                                                                        .css('-webkit-transform', 'scale(' + scale + ',' + scale + ') translate( ' + x + 'px, ' + y + 'px )')
+                                                                        .css('-moz-transform', 'scale(' + scale + ',' + scale + ') translate( ' + x + 'px, ' + y + 'px )')
+                                                                        .css('-ms-transform', 'scale(' + scale + ',' + scale + ') translate( ' + x + 'px, ' + y + 'px )')
+                                                                        .css('-o-transform', 'scale(' + scale + ',' + scale + ') translate( ' + x + 'px, ' + y + 'px )')
+                                                                        .css('transform', 'scale(' + scale + ',' + scale + ') translate( ' + x + 'px, ' + y + 'px )');
+
+                                items.eq( index - i ).css('z-index', topmost - i )
+                                                     .css( 'opacity', opacity )
+                                                     .css('-webkit-transform', 'scale(' + scale + ',' + scale + ') translate( -' + x + 'px, ' + y + 'px )')
+                                                     .css('-moz-transform', 'scale(' + scale + ',' + scale + ') translate( -' + x + 'px, ' + y + 'px )')
+                                                     .css('-ms-transform', 'scale(' + scale + ',' + scale + ') translate( -' + x + 'px, ' + y + 'px )')
+                                                     .css('-o-transform', 'scale(' + scale + ',' + scale + ') translate( -' + x + 'px, ' + y + 'px )')
+                                                     .css('transform', 'scale(' + scale + ',' + scale + ') translate( -' + x + 'px, ' + y + 'px )');
+                            }
+                        }
+                    },
+
+                    goToFirst: function(){
+                        methods.goTo( 0 );
+                    },
+
+                    goToNext: function() {
+                        methods.goTo( ( methods.getActiveIndex() + 1 ) % items.length );
+                    },
+
+                    goToLast: function() {
+                        methods.goTo( items.length - 1 );
+                    },
+
+                    goToPrev: function() {
+                        methods.goTo( methods.getActiveIndex() - 1 );
+                    },
+
+                    isCreated: function() {
+                        return coverflow.hasClass( 'gcoverflow' );
+                    },
+
+                    isNewInstance: function() {
+                        return $.type( action ) === 'undefined' || $.type( action ) === 'object';
+                    },
+
+                    loadSettings: function(){
+                        if( methods.isNewInstance() ) {
+                            options  = action,
+                            action   = 'create',
+                            settings = $.extend( {}, $.gcoverflow.defaults, options );
+                            methods.loadShorthandSettings();
+                        }
+                        else {
+                            settings = coverflow.data( 'gcoverflow-settings' );
+                        }
+                    },
+
+                    loadShorthandSettings: function() {
+                        if( coverflow.attr( 'data-num-visible' ) )     { settings.numVisible = parseInt( coverflow.attr( 'data-num-visible' ) ); }
+                        if( coverflow.attr( 'data-offsets-x' ) )       { settings.offsetsX = coverflow.attr( 'data-offsets-x' ).split(',').map( function( item ){ return parseInt( item ); }); }
+                        if( coverflow.attr( 'data-offsets-y' ) )       { settings.offsetsY = coverflow.attr( 'data-offsets-y' ).split(',').map( function( item ){ return parseInt( item ); }); }
+                        if( coverflow.attr( 'data-offsets-scale' ) )   { settings.offsetsScale = coverflow.attr( 'data-offsets-scale' ).split(',').map( function( item ){ return parseFloat( item ); }); }
+                        if( coverflow.attr( 'data-offsets-opacity' ) ) { settings.offsetsOpacity = coverflow.attr( 'data-offsets-opacity' ).split(',').map( function( item ){ return parseFloat( item ); }); }
+                    },
+
+                    reset: function() {
+                        items.removeClass( 'active' )
+                             .css( 'opacity', 0 )
+                             .css( '-webkit-transform', '' )
+                             .css( '-moz-transform', '' )
+                             .css( '-ms-transform', '' )
+                             .css( '-o-transform', '' )
+                             .css( 'transform', '' )
+                             .css( 'z-index', '' );
+                    },
+                };
+
+            var options,
+                settings,
+                coverflow = $(this),
+                items     = coverflow.children('li');
+                data      = { coverflow: coverflow };
+
+            if( coverflow.length > 0 ){
+                methods.loadSettings();
+
+                switch( action ) {
+                    case 'create':  methods.create();    break;
+                    case 'destory': methods.destory();   break;
+                    case 'first':   methods.goToFirst(); break;
+                    case 'prev':    methods.goToPrev();  break;
+                    case 'next':    methods.goToNext();  break;
+                    case 'last':    methods.goToLast();  break;
+                }
+            }
+        });
+    };
+
+    $.fn.gcoverflowTrigger = function( action ) {
+        return this.each( function() {
+            var methods = {
+
+                create: function(){
+                    if( !methods.isCreated() && options.coverflow.length > 0 ) {
+                        trigger.addClass( 'gcoverflow-trigger' )
+                               .data( 'coverflow', options.coverflow )
+                               .on( 'click', options, $.gcoverflow.handlers.onTriggerClick );
+                    }
+                },
+
+                destory: function(){
+                    trigger.removeClass( 'gcoverflow-trigger' )
+                           .removeData( 'coverflow' )
+                           .off( 'click', $.gcoverflow.handlers.onTriggerClick );
+                },
+
+                isCreated: function(){
+                    return trigger.hasClass( 'gcoverflow-trigger' );
+                },
+
+                isNewInstance: function(){
+                    return $.type( action ) === 'undefined' || $.type( action ) === 'object';
+                },
+
+                loadOptions: function(){
+                    if( methods.isNewInstance() ){
+                        options  = action,
+                        action   = 'create';
+                        if( !options.action ){ options.action = 'prev'; }
+                    }
+                },
+            };
+
+            var trigger = $(this),
+                options;
+
+            if( trigger.length > 0 ){
+                methods.loadOptions();
+
+                switch( action ) {
+                    case 'create':  methods.create();  break;
+                    case 'destory': methods.destory(); break;
+                }
+            }
+
+        });
+    };
+
+    $.gfixed = function( action ) {
+        var methods = {
+                createShorthandTargets: function() {
+                    $( '.gfixed' ).removeClass( 'gfixed' ).gfixed();
+                },
+
+                hasWatchingTarget: function() {
+                    return $.gfixed.watchingTargets.length > 0;
+                },
+
+                init: function() {
+                    methods.createShorthandTargets();
+                },
+
+                rebindScroll: function() {
+                    $( window ).off( 'scroll', $.gfixed.handlers.onScroll );
+                    if( methods.hasWatchingTarget() ) {
+                        $( window ).on( 'scroll', $.gfixed.handlers.onScroll );
+                    }
+                },
+            };
+
+        if( $.type( action ) === 'undefined' ) { action = 'init'; }
+
+        switch( action ) {
+            case 'init':         methods.init();         break;
+            case 'rebindScroll': methods.rebindScroll(); break;
+        }
+    };
+
+    $.gfixed.watchingTargets = [];
+
+    $.gfixed.defaults = {
+        offsetTop:    'auto',
+        offsetBottom: 'auto',
+    };
+
+    $.gfixed.handlers = {
+        onScroll: function() {
+            $( $.gfixed.watchingTargets ).gfixed( 'refresh' );
+        },
+    };
+
+    $.fn.gfixed = function( action, args ) {
+        return this.each( function() {
+            var methods = {
+                create: function() {
+                    methods.updateOptions();
+                    methods.createFixed();
+
+                    methods.dispatchEvent( 'gfixed.create', { gfixed: gfixed } );
+                    $.glib.log( '[glib log] create gfixed: successful.' );
+                },
+
+                createFixed: function() {
+                    gfixed.addClass( 'gfixed' );
+                    methods.watch();
+                    methods.refresh();
+                    $.gfixed( 'rebindScroll' );
+                },
+
+                destory: function() {
+                    methods.destoryFixed();
+
+                    methods.dispatchEvent( 'gfixed.destory', { gfixed: gfixed } );
+                    $.glib.log( '[glib log] destory gfixed: successful.' )
+                },
+
+                destoryFixed: function() {
+                    methods.unwatch();
+                    methods.reset();
+                    gfixed.removeData( 'gfixed-options' )
+                          .removeClass( 'gfixed' );
+                    $.gfixed( 'rebindScroll' );
+                },
+
+                dispatchEvent: function( event, data ) {
+                    $( document, gfixed ).trigger( event, data );
+                    switch( event ) {
+                        case 'gfixed.create':     if( options.onCreate )     { options.onCreate( data ); }     break;
+                        case 'gfixed.destory':    if( options.onDestory )    { options.onDestory( data ); }    break;
+                        case 'gfixed.targetmove': if( options.onTargetMove ) { options.onTargetMove( data ); } break;
+                        case 'gfixed.update':     if( options.onUpdate )     { options.onUpdate( data ); }     break;
+                    }
+                },
+
+                getShorthandOptions: function() {
+                    var shorthandOptions = {};
+                    if( gfixed.attr( 'data-offset-top' ) )    { shorthandOptions.offsetTop    = gfixed.attr( 'data-offset-top' ) == 'auto' ? 'auto' : parseInt( gfixed.attr( 'data-offset-top' ) ); }
+                    if( gfixed.attr( 'data-offset-bottom' ) ) { shorthandOptions.offsetBottom = gfixed.attr( 'data-offset-bottom' ) == 'auto' ? 'auto' : parseInt( gfixed.attr( 'data-offset-bottom' ) ); }
+                    return shorthandOptions;
+                },
+
+                isCreated: function() {
+                    return gfixed.hasClass( 'gfixed' );
+                },
+
+                isNewInstance: function() {
+                    if( $.type( action ) === 'undefined' || $.type( action ) === 'object' ){
+                        args = action;
+                        action = 'create';
+                    }
+
+                    return action === 'create';
+                },
+
+                load: function(){
+                    if( methods.isNewInstance() ) {
+                        if( methods.isCreated() ){
+                            $.glib.log( '[glib log] create gfixed: failed - gfixed already created.' );
+                            exit = true;
+                        }
+                        else {
+                            options = $.extend( {}, $.gfixed.defaults, methods.getShorthandOptions(), args );
+                        }
+                    }
+                    else {
+                        if( methods.isCreated() ){
+                            if( action === 'options' ){
+                                if( args ){
+                                    options = $.extend( {}, gfixed.data( 'gfixed-options' ), args );
+                                }
+                                else {
+                                    $.glib.log( '[glib log] update gfixed options: failed - options not defined.' );
+                                    exit = true;
+                                }
+                            }
+                            else {
+                                options = gfixed.data( 'gfixed-options' );
+                            }
+                        }
+                        else {
+                            $.glib.log( '[glib log] gfixed: command "' + action + '" failed - gfixed never created.' );
+                        }
+                    }
+                },
+
+                refresh: function(){
+                    var top = ( options.offsetBottom && options.offsetBottom != 'auto' )
+                                ? ( $(document).scrollTop() + $(window).height() - options.offsetBottom - gfixed.outerHeight() )
+                                : ( options.offsetTop + $(document).scrollTop() );
+                    gfixed.css( 'top', top );
+
+                    methods.dispatchEvent( 'gfixed.targetmove', { gfixed: gfixed } );
+                },
+
+                reset: function(){
+                    fixed.css( 'top', '' );
+                },
+
+                unwatch: function() {
+                    var index = $.gfixed.watchingTargets.indexOf( gfixed );
+                    $.gfixed.watchingTargets.splice( index, 1 );
+                },
+
+                updateOptions: function() {
+                    gfixed.data( 'gfixed-options', options );
+                },
+
+                update: function() {
+                    methods.refresh();
+
+                    methods.dispatchEvent( 'gfixed.update', { gfixed: gfixed } );
+                    $.glib.log( '[glib log] update gfixed: successful.' );
+                },
+
+                watch: function() {
+                    $.gfixed.watchingTargets.push( gfixed );
+                },
+            };
+
+            var gfixed = $(this),
+                options,
+                exit = false;
+
+            if( gfixed.length == 0 ){
+                $.glib.log( '[glib log] gfixed: target element not found.' );
+            }
+            else if( gfixed.length == 1 ){
+                methods.load();
+
+                if( !exit ){
+                    switch( action ) {
+                        case 'create':  methods.create();        break;
+                        case 'destory': methods.destory();       break;
+                        case 'options': methods.updateOptions(); break;
+                        case 'update':  methods.update();        break;
+                        case 'refresh': methods.refresh();        break;
+                        default:        $.glib.log( '[glib log] gfixed: command "' + action + '" not found.' );
+                    }
+                }
+            }
+            else {
+                gfixed.each( function(){
+                    $(this).gfixed( action, args );
+                });
+            }
+        });
+    };
+
+    $.gdetect = function( action ) {
+        var methods = {
+                isSafari:        function() { return navigator.userAgent.indexOf( 'Safari/' ) > -1 && navigator.userAgent.indexOf( 'Chrome/' ) == -1; },
+                isChrome:        function() { return navigator.userAgent.indexOf( 'Safari/' ) > -1 && navigator.userAgent.indexOf( 'Chrome/' ) > -1; },
+                isFirefox:       function() { return navigator.userAgent.indexOf( 'Firefox/' ) > -1; },
+                isIE:            function() { return navigator.userAgent.indexOf( 'MSIE' ) > -1 || navigator.userAgent.indexOf( 'Trident/' ) > -1; },
+                isOpera:         function() { return navigator.userAgent.indexOf( 'Opera' ) > -1 && !isOperaMini(); },
+                isMobile:        function() { return methods.isAndroid() || methods.isBlackBerry() || methods.isIOS() || methods.isOperaMini() || methods.isWindows(); },
+                isAndroid:       function() { return navigator.userAgent.match(/Android/i); },
+                isBlackBerry:    function() { return navigator.userAgent.match(/BlackBerry/i); },
+                isIOS:           function() { return navigator.userAgent.match(/iPhone|iPad|iPod/i); },
+                isOperaMini:     function() { return navigator.userAgent.match(/Opera Mini/i); },
+                isWindows:       function() { return navigator.userAgent.match(/IEMobile/i); },
+                isInChinese:     function() { return methods.browserLanguage().indexOf( 'zh' ) == 0; },
+                isInEnglish:     function() { return methods.browserLanguage().indexOf( 'en' ) == 0; },
+                isInMalay:       function() { return methods.browserLanguage().indexOf( 'ms' ) == 0; },
+                isInThai:        function() { return methods.browserLanguage().indexOf( 'th' ) == 0; },
+                isInVietnamese:  function() { return methods.browserLanguage().indexOf( 'vi' ) == 0; },
+                isInTagalog:     function() { return methods.browserLanguage().indexOf( 'tl' ) == 0; },
+                browser:         function() {
+                                    var ua = navigator.userAgent,
+                                    tem,
+                                    M = ua.match( /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i ) || [];
+                                    if( /trident/i.test( M[1] ) ) {
+                                    tem = /\brv[ :]+(\d+)/g.exec(ua) || [];
+                                    return 'IE '+ ( tem[1] || '' );
+                                    }
+                                    if( M[1] === 'Chrome' ) {
+                                    tem = ua.match(/\bOPR\/(\d+)/);
+                                    if( tem != null ) { return 'Opera ' + tem[1]; }
+                                    }
+                                    M = M[2] ? [ M[1], M[2] ] : [ navigator.appName, navigator.appVersion, '-?' ];
+                                    if( ( tem = ua.match(/version\/(\d+)/i) ) !=null ) { M.splice( 1, 1, tem[1] ); }
+                                    return M[0];
+                                },
+                browserVersion:  function() {
+                                    var ua = navigator.userAgent,
+                                        tem,
+                                        M = ua.match( /(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+                                    if( /trident/i.test( M[1] ) ) {
+                                        tem = /\brv[ :]+(\d+)/g.exec( ua ) || [];
+                                        return 'IE '+ ( tem[1] || '' );
+                                    }
+                                    if( M[1] ==='Chrome' ) {
+                                        tem = ua.match( /\bOPR\/(\d+)/ );
+                                        if( tem != null ) { return 'Opera ' + tem[1]; }
+                                    }
+                                    M = M[2] ? [ M[1], M[2] ] : [ navigator.appName, navigator.appVersion, '-?' ];
+                                    if( ( tem = ua.match(/version\/(\d+)/i)) != null ) { M.splice( 1, 1, tem[1] ); }
+                                    return M[1];
+                                },
+                browserLanguage: function() { return window.navigator.browserLanguage || window.navigator.language; },
+            };
+
+        switch( action ) {
+            case 'isChrome':        return methods.isChrome();
+            case 'isFirefox':       return methods.isFirefox();
+            case 'isIE':            return methods.isIE();
+            case 'isOpera':         return methods.isOpera();
+            case 'isSafari':        return methods.isSafari();
+            case 'isMobile':        return methods.isMobile();
+            case 'isAndroid':       return methods.isAndroid();
+            case 'isBlackBerry':    return methods.isBlackBerry();
+            case 'isIOS':           return methods.isIOS();
+            case 'isOperaMini':     return methods.isOperaMini();
+            case 'isWindows':       return methods.isWindows();
+            case 'isInChinese':     return methods.isInChinese();
+            case 'isInEnglish':     return methods.isInEnglish();
+            case 'isInMalay':       return methods.isInMalay();
+            case 'isInThai':        return methods.isInThai();
+            case 'isInVietnamese':  return methods.isInVietnamese();
+            case 'isInTagalog':     return methods.isInTagalog();
+            case 'browser':         return methods.browser();
+            case 'browserVersion':  return methods.browserVersion();
+            case 'browserLanguage': return methods.browserLanguage();
+            default:                $.glib.log( '[glib log] gdetect: command "' + action + '" not found.' );
+        }
+    };
+
+    String.prototype.capitalize = function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+    };
+
+    String.prototype.titleCapitalize = function( reservedWords ) {
+        var small = reservedWords || "(a|an|and|as|at|but|by|en|for|if|in|of|on|or|the|to|v[.]?|via|vs[.]?)";
+        var punct = "([!\"#$%&'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]*)";
+        var parts = [], split = /[:.;?!] |(?: |^)["?]/g, index = 0;
+
+        while( true ) {
+            var m = split.exec(this);
+
+            parts.push( this.substring( index, m ? m.index : this.length )
+                .replace( /\b([A-Za-z][a-z.'?]*)\b/g, function( all ) {
+                    return /[A-Za-z]\.[A-Za-z]/.test( all ) ? all : upper( all );
+                })
+                .replace( RegExp( "\\b" + small + "\\b", "ig" ), lower )
+                .replace( RegExp( "^" + punct + small + "\\b", "ig" ), function( all, punct, word ) {
+                    return punct + upper( word );
+                })
+                .replace( RegExp("\\b" + small + punct + "$", "ig"), upper) );
+
+            index = split.lastIndex;
+
+            if( m ) parts.push( m[0] );
+            else break;
+        }
+
+        return parts.join("").replace( / V(s?)\. /ig, " v$1. " )
+            .replace( /(['?])S\b/ig, "$1s" )
+            .replace( /\b(AT&T|Q&A)\b/ig, function(all) {
+                return all.toUpperCase();
+            });
+
+        function lower( word ) {
+            return word.toLowerCase();
+        }
+
+        function upper( word ) {
+            return word.capitalize();
+        }
+    };
+
+    Storage.prototype.setObject = function( key, value ) {
+        this.setItem( key, JSON.stringify( value ) );
+    };
+
+    Storage.prototype.getObject = function( key ) {
+        return JSON.parse( this.getItem( key ) );
+    };
+
+    Function.prototype.inheritsFrom = function( parentClassOrObject ) {
+        if( parentClassOrObject.constructor == Function ) {
+            this.prototype = new parentClassOrObject;
+            this.prototype.constructor = this;
+            this.prototype.parent = parentClassOrObject.prototype;
+        }
+        else {
+            this.prototype = parentClassOrObject;
+            this.prototype.constructor = this;
+            this.prototype.parent = parentClassOrObject;
+        }
+        return this;
+    };
+
+    $.fn.reverse = [].reverse;
+
+    $(function() { $.glib.init(); });
+
+})( jQuery, window, document );

@@ -1,0 +1,12 @@
+<div ng-controller="ThSliderCtrl" class="ThSlider">
+  <div style="height: 343px; overflow: hidden">
+    <uib-carousel interval="myInterval" no-wrap="noWrapSlides">
+      <uib-slide ng-repeat="slide in slides track by $index" active="slide.active">
+        <a href="{{slide.url}}" ><img ng-src="http://{{slide.servers[0]}}/uploads/{{slide.file.filename}}" alt=""></a>
+        <div class="carousel-caption">
+          <h4>{{slide.description}}</h4>
+        </div>
+      </uib-slide>
+    </uib-carousel>
+  </div>
+</div>

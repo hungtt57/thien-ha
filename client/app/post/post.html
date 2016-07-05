@@ -1,0 +1,35 @@
+<div class="container">
+  <th-navbar></th-navbar>
+  <th-downloads></th-downloads>
+  <div class="row wrapper-reset">
+    <div class="col-lg-2 hidden-xs hidden-sm visible-md visible-lg col-md-3">
+      <th-sidebar></th-sidebar>
+    </div>
+    <div class="col-lg-10 no-padding col-md-9 col-sm-12 col-xs-12">
+      <ol class="breadcrumb">
+        <li><a href="/">Trang chủ</a></li>
+        <li><a href="/category/{{post.catSlug}}">{{post.category.name}}</a></li>
+        <li class="active">{{post.title}}</li>
+      </ol>
+      <div class="post-view" ng-bind-html="post.content">
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div  ng-show='isRelatePost' class="related-news">
+  <h3>Bài viết liên quan:</h3>
+  <ul>
+    
+    
+   
+    <li class="clearfix" ng-repeat="relatePost in relatePosts">
+      <a href="/category/{{relatePost.catSlug}}" class="cate-links">{{relatePost.category.name}}</a>
+      <a href="/post/{{relatePost.slug}}">{{relatePost.title}}</a>
+      <span>{{ relatePost.publish | date:'dd/MM/yyyy' }}</span>
+    </li>
+  </ul>
+</div>
+
+<th-footer></th-footer>

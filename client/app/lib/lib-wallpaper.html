@@ -1,0 +1,47 @@
+<div class="container">
+  <th-navbar></th-navbar>
+  <th-downloads></th-downloads>
+  <div class="row wrapper-reset">
+    <div class="col-lg-2 col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+      <th-sidebar></th-sidebar>
+    </div>
+    <div class="col-lg-10 col-md-9 no-padding col-sm-12 col-xs-12 ">
+      <div class="news-tabs">
+        <uib-tabset>
+          <uib-tab heading="Video" ng-click="go('/lib/video')"></uib-tab>
+          <uib-tab heading="Wallpaper" active="true">
+            <div class="lib-wrapper">
+              <div class="feature-post container-fluid">
+                <div class="row">
+                  <div class="col-md-12">
+                    <a ng-href="http://{{lib.data[0].servers[0]}}/uploads/{{lib.data[0].file.filename}}" target="_blank">
+                      <img src="http://{{lib.data[0].servers[0]}}/uploads/{{lib.data[0].file.filename}}" alt="">
+                      <p ng-show="lib.data[0].description">{{lib.data[0].description}}</p>
+                    </a>
+                  </div>
+                </div>
+              </div>
+              <div class="lib-posts container-fluid">
+                <ul class="clearfix row">
+                  <li class="col-md-4 col-sm-12 col-xs-12" ng-repeat="pic in lib.data | limitTo:maxSize:itemsPerPage*(bigCurrentPage-1) track by $index">
+                    <a ng-href="http://{{pic.servers[0]}}/uploads/{{pic.file.filename}}" target="_blank">
+                      <!--<img src="http://{{pic.servers[0]}}/uploads/{{pic.file.filename}}" alt="">-->
+                    <ui-thumbnail src="getUrl(pic.servers[0], pic.file.filename)"></ui-thumbnail>
+                    
+                      <p ng-show="pic.description">{{pic.description}}</p>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+              <div class="th-paginator">
+                <uib-pagination total-items="lib.data.length - 1" ng-model="bigCurrentPage" max-size="maxSize" class="pagination-sm" boundary-links="true" rotate="false" num-pages="numPages" previous-text="&lsaquo;" next-text="&rsaquo;" first-text="&laquo;" last-text="&raquo;"></uib-pagination>
+              </div>
+            </div>
+          </uib-tab>
+          <uib-tab heading="Screenshot" ng-click="go('/lib/screenshot')"></uib-tab>
+        </uib-tabset>
+      </div>
+    </div>
+  </div>
+</div>
+<th-footer></th-footer>

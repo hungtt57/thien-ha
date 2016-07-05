@@ -1,0 +1,39 @@
+{
+  "name": "thien-ha",
+  "version": "0.0.0",
+  "dependencies": {
+    "angular": "~1.5.0",
+    "jquery": "jQuery#~2.1.4",
+    "jquery-slimscroll": "^1.3.7",
+    "json3": "~3.3.1",
+    "es5-shim": "~3.0.1",
+    "bootstrap": "~3.1.1",
+    "angular-resource": ">=1.2.*",
+    "angular-cookies": ">=1.2.*",
+    "angular-sanitize": ">=1.2.*",
+    "angular-bootstrap": "~0.14.2",
+    "font-awesome": ">=4.1.0",
+    "lodash": "~2.4.1",
+    "angular-ui-router": "~0.2.15",
+    "angular-animate": "~1.4.7",
+    "jasny-bootstrap": "~3.1.3",
+    "zAccordion": "zaccordion#*",
+    "jquery-ui": "~1.11.4",
+    "owl.carousel": "~2.0.0-beta.3",
+    "magnific-popup": "~1.0.0",
+    "angular-loading-bar": "~0.8.0",
+    "angular-cache": "~4.4.2",
+    "Swiper": "swiper#~3.2.7",
+    "jquery-flipster": "~1.0.1",
+    "jquery.easing": "~1.3.1",
+    "angular-thumbnail": "^0.1.1"
+  },
+  "devDependencies": {
+    "angular-mocks": ">=1.2.*",
+    "angular-scenario": ">=1.2.*",
+    "angular-thumbnail": "^0.1.2"
+  },
+  "resolutions": {
+    "angular": "~1.5.5"
+  }
+}

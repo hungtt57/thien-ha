@@ -1,0 +1,135 @@
+<!-- Top navi -->
+<!--<nav class="navtop"  id="section0">-->
+  <!--<div class="inner"> <span class="logo-gar"><img src="/assets/images/landing/logo-garena.png"></span>-->
+    <!--<ul id="menu">-->
+      <!--&lt;!&ndash;<li class="active"><a href="#download">Tải game</a></li>&ndash;&gt;-->
+      <!--&lt;!&ndash;<li><a href="#trailer">Trailer</a></li>&ndash;&gt;-->
+      <!--&lt;!&ndash;<li><a href="#info-game">Giới thiệu</a></li>&ndash;&gt;-->
+      <!--&lt;!&ndash;<li><a href="#listpet">Hệ thống linh thần</a></li>&ndash;&gt;-->
+    <!--</ul>-->
+    <!--<a class="mshop" href="{{ payLink }}">-->
+      <!--<img src="/assets/images/landing/mshop.png">-->
+    <!--</a>-->
+    <!--<a class="face" href="{{ facebookLink }}">-->
+      <!--<img src="/assets/images/landing/face.png">-->
+    <!--</a>-->
+    <!--<a class="home" href="/">-->
+      <!--<img src="/assets/images/landing/home.png">-->
+    <!--</a>-->
+  <!--</div>-->
+<!--</nav>-->
+<section id="fullpage">
+  <div  class="pagedown"  id="download">
+    <div class=" maincont"> <a class="logo" href="#"><img src="/assets/images/landing/logo-game.png"></a>
+      <div class="landing-nav">
+        <a ng-href="/" target="_blank"><img src="/assets/images/landing/nav/landing-nav-home.png" alt=""></a>
+        <a ng-href="{{ facebookLink }}" target="_blank"><img src="/assets/images/landing/nav/landing-nav-facebook.png" alt=""></a>
+        <a ng-href="{{ payLink }}" target="_blank"><img src="/assets/images/landing/nav/landing-nav-mshop.png" alt=""></a>
+      </div>
+      <div class="flash-effect">
+        <object data="/assets/images/landing/effect.swf" type="application/x-shockwave-flash" width="1024" height="550" style="height: 550px;">
+          <param value="transparent" name="wmode">
+        </object>
+      </div>
+      <span class="nv1"><img src="/assets/images/landing/nv1.png"></span> <span class="nv2"><img src="/assets/images/landing/nv2.png"></span> <span class="nv3"><img src="/assets/images/landing/nv3.png"></span> </div>
+    <div class="bx-down">
+      <!--<div class="IQ"><img src="/assets/images/landing/iq.png"></div>-->
+      <div class="bxapp">
+        <a href="{{ appleLink }}"><img src="/assets/images/landing/nav/landing-nav-apple.png" alt=""></a>
+        <a href="{{ googleLink }}"><img src="/assets/images/landing/nav/landing-nav-google.png" alt=""></a>
+      <!--   <a href="{{ apkLink }}"><img src="/assets/images/landing/nav/landing-nav-apk.png" alt=""></a> -->
+           <a class="popup-download-apk" href="#popup-download-apk"><img src="/assets/images/landing/nav/landing-nav-apk.png" alt=""></a>
+     
+        <a href="{{ gplusLink }}"><img src="/assets/images/landing/nav/landing-nav-gplus.png" alt=""></a>
+      </div>
+    </div>
+  </div>
+  <div class="section pageslider" id="trailer">
+    <div class="inner">
+      <h2 class="th-landing-title">
+        <p style="color: #333">Tính năng game</p>
+        <p class="line"><span style=" background-color:#333">&nbsp;</span></p>
+      </h2>
+      <!-- bx video top game-->
+      <div class="bxvideo"><a href="{{ videoLink }}" class="popup-youtube"><img src="/assets/images/landing/trailer.png"></a></div>
+      <!-- bx Slider -->
+      <div id="sliderbanner">
+        <ul class="flip-items">
+          <li class="flip-current"><a class="cm-overlay" href="/assets/images/landing/banner/slider-popup1.jpg"><img src="/assets/images/landing/banner/img-slider1.jpg"></a></li>
+          <li><a class="cm-overlay" href="/assets/images/landing/banner/slider-popup2.jpg"><img src="/assets/images/landing/banner/img-slider2.jpg"></a></li>
+          <li><a class="cm-overlay" href="/assets/images/landing/banner/slider-popup3.jpg"><img src="/assets/images/landing/banner/img-slider3.jpg"> </a></li>
+          <li><a class="cm-overlay" href="/assets/images/landing/banner/slider-popup4.jpg"><img src="/assets/images/landing/banner/img-slider4.jpg"></a></li>
+          <li><a class="cm-overlay" href="/assets/images/landing/banner/slider-popup5.jpg"><img src="/assets/images/landing/banner/img-slider5.jpg"></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="section bxcont" id="info-game">
+    <div class="inner">
+      <h2 class="th-landing-title">
+        <p>Giới thiệu game</p>
+        <p class="line"><span>&nbsp;</span></p>
+      </h2>
+      <div class="contmid">
+        <div class="head"><img src="/assets/images/landing/title.png"></div>
+        <div class="slim-scrollbar" ng-bind-html="intro"></div>
+      </div>
+    </div>
+  </div>
+  <div class="section" id="listpet">
+    <div class="bxpet">
+      <h2 class="th-landing-title ">
+        <p style="color:#333">Linh thần</p>
+        <p class="line"><span style=" background-color:#333">&nbsp;</span></p>
+      </h2>
+      <ul class="th-landing-tabs">
+        <li data-landing-tab="{{ $index }}" ng-class="$index == 0 ? 'current': '' " ng-repeat="pet in pets.slice(0, 4) track by $index">
+          <img ng-src="{{pet.image}}" />
+        </li>
+      </ul>
+      <ul class="th-landing-tabs pull-right">
+        <li data-landing-tab="{{ $index + 4 }}" ng-repeat="pet in pets.slice(4, 8) track by $index">
+          <img ng-src="{{pet.image}}" />
+        </li>
+      </ul>
+      <div class="conttab">
+        <div id="petContent_{{ $index }}" ng-class="$index == 0 ? 'current':'' " class="th-landing-tab-content" ng-repeat="pet in pets track by $index">
+          <p class="name">{{ pet.name }}</p>
+          <p class="description">{{ pet.description }}</p>
+          <p class="imgpet"><img ng-src="{{pet.image}}"></p>
+        </div>
+      </div>
+    </div>
+<!--     <div class="th-landing-footer">
+      <p class="logo"><img src="/assets/images/landing/GameDetail_30.png"></p>
+      <p class="text">© Garena Online. Thương hiệu thuộc về
+        các chủ sở hữu tương ứng. <br>
+        Tất cả các quyền được bảo lưu.</p>
+    </div> -->
+
+
+
+  </div>
+ 
+</section>
+<footer>
+
+    <div class="custom">
+      <p>&nbsp;<img src="../assets/images/logo-footer.png" alt=""></p>
+      <p>&nbsp;</p>
+      <div class="copy">
+        <div class="right"><img src="../assets/images/18full.jpg" alt=""></div>
+        <div class="left">
+          <p>Sản phẩm được hợp tác phát hành bởi</p>
+          <p>Công ty TNHH Dịch vụ Phần mềm Bình Minh và Công ty Cổ phần Giải trí và Thể thao điện tử Việt Nam.</p>
+          <p>Văn phòng đại diện: Tầng 1, tòa nhà Machinco, số 444, đường Hoàng hoa Thám, phường Thụy Khuê, Quận Tây Hồ, Hà Nội.</p>
+          <p>Điện thoại: (04)7305-3939; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;Fax: (04)3759-2429</p>
+        </div>
+        <div style="clear:both"></div>
+      </div>
+    </div>
+  </footer>
+  <div id="popup-download-apk"  class="zoom-anim-dialog mfp-hide">
+  Sắp ra mắt
+  
+</div>
