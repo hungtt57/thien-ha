@@ -20,7 +20,7 @@ angular.module('thienHaApp', [
     'support-link': 'http://hotro.garena.vn/',
     'apple-link': 'https://app.appsflyer.com/id1047095819?pid=OrganicA&c=Website_home',
     'google-link': 'https://app.appsflyer.com/com.garena.game.worldvn?pid=OrganicA&c=Website_home',
-    'apk-link': 'https://app.appsflyer.com/com.garena.game.worldvn-Standalone?pid=OrganicA&c=Website_home',
+    'apk-link': 'http://cdn.vn.garenanow.com/gamevn/thienha/worldvn08072016.apk',
     'gplus-link': '/post/choi-thien-ha-tren-gia-lap',
     'landing-post-id': '5684e459b1567f9634702952',
     'trailer-id': '56d8125ecf7acddd7dd35c48',
